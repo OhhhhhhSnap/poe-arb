@@ -137,20 +137,6 @@ def find_opportunities(
                 return
             seen_canonical.add(cid)
 
-            margin_pct = (product - 1.0) * 100.0
-            abs_profit = product - 1.0  # per 1 unit of starting currency
-
-            if margin_pct < min_margin_pct or abs_profit < min_absolute_profit:
-                return
-
-            min_vol = min(
-                exchange_rates[c]["volume"]
-                for c in inner
-                if c in exchange_rates
-            )
-            if min_vol < min_volume:
-                return
-
             # Rotate to preferred base, or canonical minimum
             if preferred_base and preferred_base in inner:
                 display_inner = _rotate_to_start(inner, preferred_base)
@@ -160,6 +146,22 @@ def find_opportunities(
 
             display_path = display_inner + [display_inner[0]]
             base_currency = display_path[0]
+
+            margin_pct = (product - 1.0) * 100.0
+            abs_profit = product - 1.0  # per 1 unit of starting currency
+            # Compare against chaos-equivalent so the threshold is meaningful
+            abs_profit_chaos = abs_profit * exchange_rates[base_currency]["chaos_eq"]
+
+            if margin_pct < min_margin_pct or abs_profit_chaos < min_absolute_profit:
+                return
+
+            min_vol = min(
+                exchange_rates[c]["volume"]
+                for c in inner
+                if c in exchange_rates
+            )
+            if min_vol < min_volume:
+                return
             hop_count = len(display_inner)
 
             buy_r = _human_rate(display_path[0], display_path[1], exchange_rates)
@@ -177,9 +179,7 @@ def find_opportunities(
                 "base_currency": base_currency,
                 "category": category,
                 "margin_pct": round(margin_pct, 3),
-                "absolute_profit_chaos": round(
-                    abs_profit * exchange_rates[base_currency]["chaos_eq"], 6
-                ),
+                "absolute_profit_chaos": round(abs_profit_chaos, 6),
                 "buy_rate": buy_r,
                 "sell_rate": sell_r,
                 "profit_per_trade": (

@@ -132,6 +132,9 @@ async function loadStatus() {
       el.textContent = `LAN: ${data.lan_ip}:5000`;
       el.classList.remove('lan-hidden');
     }
+    const demoBanner = document.getElementById('demo-banner');
+    if (data.demo_mode) demoBanner.classList.remove('hidden');
+    else demoBanner.classList.add('hidden');
   } catch (e) {}
 }
 

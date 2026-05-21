@@ -116,7 +116,71 @@ def fetch_leagues(force: bool = False):
     _state["leagues_fetched_at"] = now
 
 
+def _build_demo_opportunities(game_version: str) -> list[dict]:
+    now = datetime.now(timezone.utc).isoformat()
+    league = cfg.get_config()["league_name"]
+
+    def opp(rank, path, margin, abs_profit, vol, cat, buy_r, sell_r):
+        inner = path[:-1]
+        conf = "high" if vol >= 100 and len(inner) <= 3 else "medium"
+        cid = "|".join(inner)
+        whisper_a, whisper_b = path[0], path[1]
+        return {
+            "id": cid,
+            "rank": rank,
+            "type": "direct" if len(inner) == 2 else "multihop",
+            "path": path,
+            "base_currency": path[0],
+            "category": cat,
+            "margin_pct": margin,
+            "absolute_profit_chaos": abs_profit,
+            "buy_rate": buy_r,
+            "sell_rate": sell_r,
+            "profit_per_trade": f"{margin:.3f}% per {path[0]} cycled",
+            "volume": vol,
+            "confidence": conf,
+            "icons": [""] * len(path),
+            "spotted_at": now,
+            "trade_whisper": f"@whisper Hi, I'd like to buy your 1 {whisper_b} for my 1 {whisper_a} in {league}.",
+            "urgency": "FAST" if len(inner) > 3 else "",
+        }
+
+    if game_version == "poe2":
+        return [
+            opp(1,  ["Divine Orb", "Essence of Anger", "Scarab of Divinity", "Divine Orb"],      23.4, 40.9,  150, "Currency",       "1 Divine Orb = 5.84 Essence of Anger",           "5.13 Essence of Anger = 1 Divine Orb"),
+            opp(2,  ["Abandoned Wealth", "Essence of Anger", "Divine Orb", "Abandoned Wealth"],   39.2, 86.2,  150, "DivinationCard", "1 Abandoned Wealth = 7.96 Essence of Anger",      "7.03 Essence of Anger = 1 Abandoned Wealth"),
+            opp(3,  ["Abandoned Wealth", "Scarab of Divinity", "Divine Orb", "Abandoned Wealth"], 36.4, 80.2,  180, "DivinationCard", "1 Abandoned Wealth = 14.00 Scarab of Divinity",   "12.35 Scarab of Divinity = 1 Abandoned Wealth"),
+            opp(4,  ["Divine Orb", "Scarab of Divinity", "Essence of Anger", "Divine Orb"],       23.4, 40.9,  150, "Currency",       "1 Divine Orb = 10.28 Scarab of Divinity",         "9.07 Scarab of Divinity = 1 Divine Orb"),
+            opp(5,  ["Abandoned Wealth", "Divine Orb", "Abandoned Wealth",  "Divine Orb"],        25.9, 57.1,  180, "DivinationCard", "1 Abandoned Wealth = 1.40 Divine Orb",            "1.12 Divine Orb = 1 Abandoned Wealth"),
+            opp(6,  ["Essence of Anger", "Scarab of Divinity", "Divine Orb", "Essence of Anger"], 19.7,  6.3,  150, "Essence",        "1 Essence of Anger = 1.09 Scarab of Divinity",    "1 Scarab of Divinity = 1.08 Essence of Anger"),
+            opp(7,  ["Divine Orb", "Essence of Anger", "Divine Orb",        "Essence of Anger"],  13.9, 24.3,  150, "Currency",       "1 Divine Orb = 5.84 Essence of Anger",            "5.13 Essence of Anger = 1 Divine Orb"),
+            opp(8,  ["Abandoned Wealth", "Chaos Orb", "Divine Orb", "Abandoned Wealth"],          25.9, 57.1, 9999, "DivinationCard", "1 Abandoned Wealth = 242.00 Chaos Orb",           "1.12 Divine Orb = 1 Abandoned Wealth"),
+            opp(9,  ["Divine Orb", "Scarab of Divinity", "Divine Orb",      "Scarab of Divinity"],11.6, 20.3,  240, "Currency",       "1 Divine Orb = 10.28 Scarab of Divinity",         "9.07 Scarab of Divinity = 1 Divine Orb"),
+            opp(10, ["Scarab of Divinity", "Essence of Anger", "Divine Orb", "Scarab of Divinity"],19.7, 3.5, 150, "Scarab",         "1 Scarab of Divinity = 0.92 Essence of Anger",    "1 Essence of Anger = 0.91 Scarab of Divinity"),
+            opp(11, ["Abandoned Wealth", "Essence of Anger", "Chaos Orb", "Abandoned Wealth"],    35.1, 77.2,  150, "DivinationCard", "1 Abandoned Wealth = 7.96 Essence of Anger",      "7.03 Essence of Anger = 1 Abandoned Wealth"),
+            opp(12, ["Divine Orb", "Chaos Orb", "Essence of Anger", "Divine Orb"],                13.9, 24.3, 9999, "Currency",       "1 Divine Orb = 177.63 Chaos Orb",                "157.00 Chaos Orb = 1 Divine Orb"),
+        ]
+
+    # PoE1 demo
+    return [
+        opp(1,  ["Divine Orb", "Deafening Essence of Loathing", "Exalted Orb", "Divine Orb"],     18.5, 31.5,  120, "Currency",       "1 Divine Orb = 4.71 Deafening Essence",           "4.20 Deafening Essence = 1 Divine Orb"),
+        opp(2,  ["Abandoned Wealth", "Divine Orb", "Exalted Orb", "Abandoned Wealth"],            28.3, 56.6,  200, "DivinationCard", "1 Abandoned Wealth = 1.14 Divine Orb",            "1.02 Divine Orb = 1 Abandoned Wealth"),
+        opp(3,  ["Divine Orb", "Golden Oil", "Exalted Orb", "Divine Orb"],                        16.2, 27.5,  300, "Currency",       "1 Divine Orb = 9.17 Golden Oil",                  "8.29 Golden Oil = 1 Divine Orb"),
+        opp(4,  ["Abandoned Wealth", "Deafening Essence of Loathing", "Divine Orb", "Abandoned Wealth"], 35.0, 70.0, 120, "DivinationCard", "1 Abandoned Wealth = 5.71 Deafening Essence", "5.00 Deafening Essence = 1 Abandoned Wealth"),
+        opp(5,  ["Exalted Orb", "Golden Oil", "Divine Orb", "Exalted Orb"],                       14.8, 27.8,  300, "Currency",       "1 Exalted Orb = 10.00 Golden Oil",                "9.17 Golden Oil = 1 Exalted Orb"),
+        opp(6,  ["Abandoned Wealth", "Golden Oil", "Divine Orb", "Abandoned Wealth"],             32.3, 64.6,  300, "DivinationCard", "1 Abandoned Wealth = 11.11 Golden Oil",            "9.43 Golden Oil = 1 Abandoned Wealth"),
+        opp(7,  ["Divine Orb", "Deafening Essence of Loathing", "Divine Orb", "Exalted Orb"],     12.1, 20.6,  120, "Currency",       "1 Divine Orb = 4.71 Deafening Essence",           "4.20 Deafening Essence = 1 Divine Orb"),
+        opp(8,  ["Abandoned Wealth", "Chaos Orb", "Divine Orb", "Abandoned Wealth"],             28.3, 56.6, 9999, "DivinationCard", "1 Abandoned Wealth = 200.00 Chaos Orb",           "1.02 Divine Orb = 1 Abandoned Wealth"),
+    ]
+
+
 def refresh_data(force: bool = False):
+    if ninja_client.DEMO_MODE:
+        _state["opportunities"] = _build_demo_opportunities(cfg.get_config()["game_version"])
+        _state["last_refresh"] = datetime.now(timezone.utc).isoformat()
+        _state["error"] = None
+        return
+
     c = cfg.get_config()
     game = c["game_version"]
     league = c["league_name"]
@@ -241,6 +305,7 @@ def api_status():
         "bind_all": c["bind_all_interfaces"],
         "game_version": c["game_version"],
         "league": c["league_name"],
+        "demo_mode": ninja_client.DEMO_MODE,
     })
 
 

@@ -164,6 +164,7 @@ html, body {
 
 .stale-banner { background: #2a2200; color: var(--yellow); border-bottom: 1px solid #4a3a00; }
 .error-banner { background: #2a0808; color: var(--red); border-bottom: 1px solid #4a1010; }
+.demo-banner  { background: #0a1a2a; color: #4fc3f7; border-bottom: 1px solid #1a3a5a; letter-spacing: 0.08em; }
 .hidden { display: none !important; }
 
 /* === STATS BAR === */

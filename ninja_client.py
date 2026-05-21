@@ -19,12 +19,15 @@ Rate model:
   This means sell > buy, giving positive margins consistent with the
   currency model.
 """
+import os
 import time
 import logging
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
+
+DEMO_MODE = os.environ.get("DEMO_MODE", "false").lower() == "true"
 
 POE2_OVERVIEW_URL = "https://poe.ninja/poe2/api/economy/currencyexchange/overview"
 POE1_OVERVIEW_URL = "https://poe.ninja/api/data/currencyoverview"
@@ -392,6 +395,7 @@ def fetch_all(
     league: str,
     force: bool = False,
     max_items_per_cat: int = 40,
+    _demo: bool = False,
 ) -> tuple[dict, dict, float | None]:
     """
     Fetch all currency and item category data in parallel.
@@ -399,6 +403,9 @@ def fetch_all(
     Returns (exchange_rates, icons, timestamp) — same signature as
     parse_poe2 / parse_poe1 but merged across all categories.
     """
+    if DEMO_MODE or _demo:
+        return _build_demo_rates(game_version)
+
     # 1. Fetch currency exchange data
     if game_version == "poe2":
         currency_data = fetch_poe2(league, force=force)
@@ -440,3 +447,76 @@ def get_data_age(game_version: str, league: str) -> float | None:
     if last is None:
         return None
     return time.time() - last
+
+
+# ---------------------------------------------------------------------------
+# Demo mode — compact realistic data (~20 nodes) so DFS completes quickly
+# ---------------------------------------------------------------------------
+# Keep total nodes < 25 per game version. DFS is O(n^depth), so 20^4 = 160k
+# steps — fast. 57^4 = 10M — hangs for seconds in Python.
+
+# 5 nodes → C(4,2)*2 = 12 AW-base + 2 Divine-base = 14 three-hop cycles (fast + clean demo).
+# Chaos Orb is always included as base currency.
+_DEMO_NODES: dict[str, dict[str, list]] = {
+    "poe2": {
+        "Currency": [
+            # name, mid_price
+            ("Divine Orb", 175),
+        ],
+        "DivinationCard": [
+            # name, chaos_val, volume
+            ("Abandoned Wealth", 220, 180),
+        ],
+        "Essence": [
+            ("Essence of Anger", 32, 150),
+        ],
+        "Scarab": [
+            ("Scarab of Divinity", 18, 240),
+        ],
+    },
+    "poe1": {
+        "Currency": [
+            # name, sell, buy, chaos_eq, volume
+            ("Divine Orb",       165, 175, 170, 800),
+            ("Exalted Orb",      180, 195, 188, 600),
+        ],
+        "DivinationCard": [
+            ("Abandoned Wealth", 200, 200),
+        ],
+        "Essence": [
+            ("Deafening Essence of Loathing", 35, 120),
+        ],
+        "Oil": [
+            ("Golden Oil", 18, 300),
+        ],
+    },
+}
+
+
+def _build_demo_rates(game_version: str) -> tuple[dict, dict, float]:
+    rates: dict = {}
+    icons: dict = {}
+    rates["Chaos Orb"] = {"sell": 1.0, "buy": 1.0, "chaos_eq": 1.0, "volume": 9999, "category": "Currency"}
+
+    nodes = _DEMO_NODES.get(game_version, _DEMO_NODES["poe2"])
+    for cat, items in nodes.items():
+        spread = CATEGORY_CONFIG.get(cat, {"spread": 0.05})["spread"]
+        for row in items:
+            if cat == "Currency":
+                if game_version == "poe2":
+                    name, mid = row
+                    s = POE2_IMPLICIT_HALF_SPREAD
+                    rates[name] = {"sell": round(mid*(1+s),4), "buy": round(mid*(1-s),4), "chaos_eq": mid, "volume": 500, "category": cat}
+                else:
+                    name, sell, buy, eq, vol = row
+                    rates[name] = {"sell": sell, "buy": buy, "chaos_eq": eq, "volume": vol, "category": cat}
+            else:
+                name, chaos_val, volume = row
+                rates[name] = {
+                    "sell": round(chaos_val*(1+spread),4),
+                    "buy": round(chaos_val*(1-spread),4),
+                    "chaos_eq": chaos_val, "volume": volume, "category": cat,
+                }
+
+    logger.info("Demo mode: %d nodes loaded", len(rates))
+    return rates, icons, time.time()
