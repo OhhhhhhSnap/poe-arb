@@ -28,6 +28,11 @@ _config = {
     "bind_all_interfaces": BIND_ALL_INTERFACES,
     "sound_alerts": SOUND_ALERTS,
     "preferred_base": PREFERRED_BASE,
+    "enabled_categories": [
+        "Currency", "Fragment", "Scarab", "Essence", "DistilledEmotion",
+        "Oil", "Fossil", "Resonator", "Incubator", "DivinationCard", "Omen", "SoulCore",
+    ],
+    "max_items_per_category": 40,
 }
 
 
@@ -41,7 +46,7 @@ def update_config(updates: dict):
         "min_margin_pct", "min_absolute_profit_chaos", "min_volume",
         "max_hop_depth", "discord_webhook_url", "notify_on_new_opportunity",
         "notify_min_margin_pct", "bind_all_interfaces", "sound_alerts",
-        "preferred_base",
+        "preferred_base", "enabled_categories", "max_items_per_category",
     }
     for k, v in updates.items():
         if k in allowed:

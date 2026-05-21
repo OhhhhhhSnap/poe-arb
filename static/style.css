@@ -938,3 +938,110 @@ details[open] .calc-toggle { color: var(--gold); }
   margin-right: 3px;
   border-radius: 1px;
 }
+
+/* === SEARCH INPUT === */
+.search-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  padding: 0.28rem 0.5rem;
+  border-radius: 3px;
+  width: 150px;
+  outline: none;
+}
+
+.search-input:focus { border-color: var(--gold); }
+
+.search-input::placeholder { color: var(--text-sec); }
+
+@media (max-width: 768px) {
+  .search-input { width: 100%; }
+}
+
+/* === CATEGORY FILTER BAR === */
+.category-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-muted);
+  padding: 0.5rem 1.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.category-filter-bar::-webkit-scrollbar { display: none; }
+
+.category-chip {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: none;
+  color: var(--text-sec);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.category-chip .cat-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.category-chip:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
+.category-chip.active {
+  color: var(--text);
+  border-color: currentColor;
+}
+
+/* === BEST BADGE === */
+.best-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-family: var(--mono);
+  font-size: 0.58rem;
+  color: #000;
+  background: var(--gold);
+  padding: 0.15rem 0.35rem;
+  border-radius: 2px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  z-index: 1;
+}
+
+/* === CATEGORY BADGE ON CARD === */
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--text-sec);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.1rem 0.35rem;
+  white-space: nowrap;
+}
+
+.category-badge .cat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}

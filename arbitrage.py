@@ -117,6 +117,10 @@ def find_opportunities(
     if len(exchange_rates) < 2:
         return []
 
+    # Cap depth for large graphs to keep search time reasonable
+    if len(exchange_rates) > 100 and max_depth > 3:
+        max_depth = 3
+
     currencies = list(exchange_rates.keys())
     seen_canonical: set = set()
     opportunities: list = []
@@ -164,11 +168,14 @@ def find_opportunities(
             path_icons = [icons.get(c, "") for c in display_path]
             spotted = _spotted_at(cid)
 
+            category = exchange_rates[base_currency].get("category", "Currency")
+
             opp = {
                 "id": cid,
                 "type": "direct" if hop_count == 2 else "multihop",
                 "path": display_path,
                 "base_currency": base_currency,
+                "category": category,
                 "margin_pct": round(margin_pct, 3),
                 "absolute_profit_chaos": round(
                     abs_profit * exchange_rates[base_currency]["chaos_eq"], 6
@@ -214,4 +221,6 @@ def find_opportunities(
         dfs([start], 1.0)
 
     opportunities.sort(key=lambda x: x["margin_pct"], reverse=True)
+    for idx, opp in enumerate(opportunities):
+        opp["rank"] = idx + 1
     return opportunities

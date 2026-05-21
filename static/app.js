@@ -9,11 +9,14 @@ const state = {
   sessionTotal: 0,
   config: {},
   leagues: { poe1: [], poe2: [] },
+  categoryConfig: {},  // loaded from /api/categories
   pollTimer: null,
   budget: 1000,
   currentModal: null,
   knownIds: new Set(),
-  activeBase: '',  // '' = show all base currencies
+  activeBase: '',      // '' = show all base currencies
+  activeCategory: '', // '' = show all categories
+  searchQuery: '',
 };
 
 // === AUDIO ===
@@ -80,6 +83,15 @@ async function loadLeagues(force) {
     };
     renderLeagueSelect();
     showWarning('League list unavailable — using fallback');
+  }
+}
+
+async function loadCategories() {
+  try {
+    state.categoryConfig = await apiFetch('/api/categories');
+    updateCategoryChips();
+  } catch (e) {
+    console.warn('Category config fetch failed', e);
   }
 }
 
@@ -164,9 +176,35 @@ function handleOpportunitiesData(data) {
   }
 
   updateBaseFilterChips();
+  updateCategoryChips();
   renderCards(brandNew.map(o => o.id));
   updateStatBar();
   renderCalcResults();
+}
+
+// === FILTERED OPPORTUNITIES ===
+function filteredOpportunities() {
+  let opps = state.opportunities;
+
+  if (state.activeBase) {
+    opps = opps.filter(o => o.base_currency === state.activeBase);
+  }
+
+  if (state.activeCategory) {
+    opps = opps.filter(o => (o.category || 'Currency') === state.activeCategory);
+  }
+
+  if (state.searchQuery) {
+    const q = state.searchQuery.toLowerCase();
+    opps = opps.filter(o => {
+      const pathMatch = (o.path || []).some(p => p.toLowerCase().includes(q));
+      const catMatch = (o.category || '').toLowerCase().includes(q);
+      const baseMatch = (o.base_currency || '').toLowerCase().includes(q);
+      return pathMatch || catMatch || baseMatch;
+    });
+  }
+
+  return opps;
 }
 
 // === BASE FILTER CHIPS ===
@@ -192,27 +230,83 @@ function updateBaseFilterChips() {
       state.activeBase = b;
       updateBaseFilterChips();
       renderCards();
+      updateStatBar();
     });
     bar.appendChild(btn);
   });
 }
 
-function visibleOpportunities() {
-  if (!state.activeBase) return state.opportunities;
-  return state.opportunities.filter(o => o.base_currency === state.activeBase);
+// === CATEGORY CHIPS ===
+function updateCategoryChips() {
+  const container = document.getElementById('category-chips');
+  if (!container) return;
+
+  // Collect categories present in current opportunities
+  const presentCats = new Set(state.opportunities.map(o => o.category).filter(Boolean));
+
+  // Validate active selection
+  if (state.activeCategory && !presentCats.has(state.activeCategory)) {
+    state.activeCategory = '';
+  }
+
+  container.innerHTML = '';
+
+  // "All" chip
+  const allBtn = document.createElement('button');
+  allBtn.className = 'category-chip' + (state.activeCategory === '' ? ' active' : '');
+  allBtn.dataset.cat = '';
+  allBtn.innerHTML = 'All';
+  allBtn.addEventListener('click', () => {
+    state.activeCategory = '';
+    updateCategoryChips();
+    renderCards();
+    updateStatBar();
+  });
+  container.appendChild(allBtn);
+
+  // Per-category chips
+  const catOrder = Object.keys(state.categoryConfig);
+  const ordered = catOrder.filter(c => presentCats.has(c));
+  // Any categories present but not in config order go at the end
+  presentCats.forEach(c => { if (!ordered.includes(c)) ordered.push(c); });
+
+  ordered.forEach(cat => {
+    const cfg = state.categoryConfig[cat] || {};
+    const color = cfg.color || '#888';
+    const label = cfg.label || cat;
+    const isActive = state.activeCategory === cat;
+
+    const btn = document.createElement('button');
+    btn.className = 'category-chip' + (isActive ? ' active' : '');
+    btn.dataset.cat = cat;
+    if (isActive) {
+      btn.style.borderColor = color;
+      btn.style.color = color;
+      btn.style.background = color + '1a'; // ~10% opacity tint
+    }
+    btn.innerHTML = `<span class="cat-dot" style="background:${escHtml(color)}"></span>${escHtml(label)}`;
+    btn.addEventListener('click', () => {
+      state.activeCategory = cat;
+      updateCategoryChips();
+      renderCards();
+      updateStatBar();
+    });
+    container.appendChild(btn);
+  });
 }
 
 // === RENDER CARDS ===
 function renderCards(newIds = []) {
   const area = document.getElementById('cards-area');
   const empty = document.getElementById('empty-state');
-  const visible = visibleOpportunities();
+  const visible = filteredOpportunities();
 
   if (visible.length === 0) {
     empty.style.display = 'flex';
+    const hasFilter = state.activeBase || state.activeCategory || state.searchQuery;
     empty.querySelector('.empty-title').textContent =
-      state.activeBase
-        ? `No opportunities starting with ${state.activeBase}`
+      hasFilter
+        ? 'No opportunities match current filters'
         : 'Scanning for opportunities...';
     // Remove all cards except empty state
     [...area.children].forEach(c => {
@@ -233,8 +327,9 @@ function renderCards(newIds = []) {
     rendered.add(opp.id);
     let card = existingById[opp.id];
     const isNew = newIds ? newIds.includes(opp.id) : false;
+    const isBest = idx === 0;
     if (!card) {
-      card = buildCard(opp, isNew);
+      card = buildCard(opp, isNew, isBest);
       // Insert at correct position
       const cards = [...area.querySelectorAll('.opp-card')];
       if (idx < cards.length) {
@@ -243,7 +338,7 @@ function renderCards(newIds = []) {
         area.appendChild(card);
       }
     } else {
-      updateCard(card, opp, isNew);
+      updateCard(card, opp, isNew, isBest);
     }
   });
 
@@ -253,17 +348,17 @@ function renderCards(newIds = []) {
   });
 }
 
-function buildCard(opp, isNew) {
+function buildCard(opp, isNew, isBest) {
   const card = document.createElement('div');
   card.className = 'opp-card' + (isNew ? ' new-flash' : '');
   card.dataset.oppId = opp.id;
-  card.innerHTML = cardHtml(opp);
+  card.innerHTML = cardHtml(opp, isBest);
   wireCardButtons(card, opp);
   return card;
 }
 
-function updateCard(card, opp, isNew) {
-  card.innerHTML = cardHtml(opp);
+function updateCard(card, opp, isNew, isBest) {
+  card.innerHTML = cardHtml(opp, isBest);
   if (isNew) {
     card.classList.add('new-flash');
     setTimeout(() => card.classList.remove('new-flash'), 1000);
@@ -271,7 +366,7 @@ function updateCard(card, opp, isNew) {
   wireCardButtons(card, opp);
 }
 
-function cardHtml(opp) {
+function cardHtml(opp, isBest) {
   const isChain = opp.type === 'multihop' && opp.path.length > 3;
   const marginClass = opp.margin_pct >= 5 ? 'green' : 'yellow';
   const budget = state.budget || 1000;
@@ -279,6 +374,13 @@ function cardHtml(opp) {
   const spottedAgo = timeSince(opp.spotted_at);
   const base = opp.base_currency || 'Chaos Orb';
   const baseIcon = opp.icons && opp.icons[0] ? opp.icons[0] : '';
+
+  // Category badge
+  const cat = opp.category || 'Currency';
+  const catCfg = state.categoryConfig[cat] || {};
+  const catColor = catCfg.color || '#888';
+  const catLabel = catCfg.label || cat;
+  const catBadgeHtml = `<span class="category-badge"><span class="cat-dot" style="background:${escHtml(catColor)}"></span>${escHtml(catLabel)}</span>`;
 
   // Path icons — show all nodes in the cycle, including repeated start at end
   let pathHtml = '';
@@ -291,12 +393,13 @@ function cardHtml(opp) {
     }
   });
 
-  // Base currency badge (only show if not "All" filter and base != Chaos)
+  // Base currency badge
   const baseBadgeHtml = `<span class="base-badge">${
     baseIcon ? `<img class="base-icon" src="${escHtml(baseIcon)}" alt="">` : ''
   }start: ${escHtml(base)}</span>`;
 
   return `
+    ${isBest ? '<span class="best-badge">BEST</span>' : ''}
     ${isChain ? '<span class="chain-badge">CHAIN</span>' : ''}
     <div class="card-top">
       <div class="card-path-icons">${pathHtml}</div>
@@ -312,6 +415,7 @@ function cardHtml(opp) {
     <div class="card-profit">${escHtml(opp.profit_per_trade)}</div>
     <div class="card-meta">
       ${baseBadgeHtml}
+      ${catBadgeHtml}
       <span class="conf-dot ${opp.confidence}" title="${opp.confidence} confidence"></span>
       <span class="abs-profit">${opp.absolute_profit_chaos.toFixed(3)}c abs</span>
       <span class="spotted">${spottedAgo}</span>
@@ -401,10 +505,11 @@ function renderFlips() {
 
 // === STATS BAR ===
 function updateStatBar() {
-  const visible = visibleOpportunities();
+  const visible = filteredOpportunities();
   const all = state.opportunities;
+  const hasFilter = state.activeBase || state.activeCategory || state.searchQuery;
   document.getElementById('stat-opps').textContent =
-    state.activeBase ? `${visible.length} / ${all.length}` : all.length;
+    hasFilter ? `${visible.length} / ${all.length}` : all.length;
   if (visible.length > 0) {
     document.getElementById('stat-best').textContent = `${visible[0].margin_pct.toFixed(2)}%`;
   } else if (all.length > 0) {
@@ -421,7 +526,7 @@ function renderCalcResults() {
   state.budget = budget;
   const container = document.getElementById('calc-results');
   container.innerHTML = '';
-  const visible = visibleOpportunities();
+  const visible = filteredOpportunities();
   visible.slice(0, 8).forEach(opp => {
     const profit = (budget * opp.absolute_profit_chaos).toFixed(1);
     const chip = document.createElement('div');
@@ -454,6 +559,7 @@ function applyConfigToSettings() {
   setCheck('s-sound', c.sound_alerts);
   setCheck('s-discord-notify', c.notify_on_new_opportunity);
   setCheck('s-lan', c.bind_all_interfaces);
+  // enabled_categories and max_items_per_category are server-side only; no UI inputs for them yet
 }
 
 function setVal(id, val) {
@@ -537,6 +643,7 @@ async function init() {
   document.getElementById('btn-poe1').classList.toggle('active', v === 'poe1');
 
   await loadConfig();
+  await loadCategories();
   await loadLeagues(false);
   await loadOpportunities();
   await loadFlips();
@@ -587,6 +694,14 @@ async function init() {
 
   // Force refresh
   document.getElementById('btn-force-refresh').addEventListener('click', forceRefresh);
+
+  // Search input
+  document.getElementById('item-search').addEventListener('input', e => {
+    state.searchQuery = e.target.value.trim();
+    renderCards();
+    updateStatBar();
+    renderCalcResults();
+  });
 
   // Apply filters
   document.getElementById('btn-apply-filters').addEventListener('click', async () => {

@@ -11,26 +11,67 @@ Rate model:
 
   For PoE2 we only have a single midpoint price, so we model a small
   implicit spread (~3%) to make the same graph structure work.
+
+  For item categories (Essence, Scarab, etc.) we only have chaosValue,
+  so we apply a category-specific half-spread symmetrically:
+    sell = chaosValue * (1 + spread)   — what buyers offer (BID above mid)
+    buy  = chaosValue * (1 - spread)   — what sellers ask (ASK below mid)
+  This means sell > buy, giving positive margins consistent with the
+  currency model.
 """
 import time
 import logging
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
 
 POE2_OVERVIEW_URL = "https://poe.ninja/poe2/api/economy/currencyexchange/overview"
 POE1_OVERVIEW_URL = "https://poe.ninja/api/data/currencyoverview"
+POE1_ITEM_OVERVIEW_URL = "https://poe.ninja/api/data/itemoverview"
+POE2_ITEM_OVERVIEW_URL = "https://poe.ninja/poe2/api/economy/item/overview"
 MIN_FETCH_INTERVAL = 30
 POE2_IMPLICIT_HALF_SPREAD = 0.015  # ±1.5% around midpoint
 
 _cache: dict = {}
 _last_fetch: dict = {}
 
+# ---------------------------------------------------------------------------
+# Category configuration
+# ---------------------------------------------------------------------------
+
+CATEGORY_CONFIG = {
+    "Currency":         {"spread": 0.0,   "label": "Currency",     "color": "#c8a84b"},  # real spread from API
+    "Fragment":         {"spread": 0.03,  "label": "Fragment",     "color": "#9c6fff"},
+    "Scarab":           {"spread": 0.04,  "label": "Scarab",       "color": "#4fc3f7"},
+    "Essence":          {"spread": 0.05,  "label": "Essence",      "color": "#ff8f00"},
+    "DistilledEmotion": {"spread": 0.05,  "label": "Distilled",    "color": "#e91e8c"},
+    "Oil":              {"spread": 0.06,  "label": "Oil",          "color": "#aed581"},
+    "Fossil":           {"spread": 0.07,  "label": "Fossil",       "color": "#80cbc4"},
+    "Resonator":        {"spread": 0.08,  "label": "Resonator",    "color": "#ce93d8"},
+    "Incubator":        {"spread": 0.08,  "label": "Incubator",    "color": "#f48fb1"},
+    "DivinationCard":   {"spread": 0.10,  "label": "Div Card",     "color": "#ef9a9a"},
+    "Omen":             {"spread": 0.05,  "label": "Omen",         "color": "#80deea"},
+    "SoulCore":         {"spread": 0.06,  "label": "Soul Core",    "color": "#a5d6a7"},
+}
+
+# Item categories to fetch per game version
+POE1_ITEM_CATEGORIES = ["Essence", "Scarab", "Fragment", "Oil", "Fossil", "Resonator", "Incubator", "DivinationCard"]
+POE2_ITEM_CATEGORIES = ["Essence", "Scarab", "Fragment", "DistilledEmotion", "Omen", "SoulCore", "DivinationCard"]
+
+
+# ---------------------------------------------------------------------------
+# Rate limiting helpers
+# ---------------------------------------------------------------------------
 
 def _rate_limited(key: str) -> bool:
     last = _last_fetch.get(key, 0)
     return (time.time() - last) < MIN_FETCH_INTERVAL
 
+
+# ---------------------------------------------------------------------------
+# Raw fetch functions (currency exchange)
+# ---------------------------------------------------------------------------
 
 def fetch_poe2(league: str, force: bool = False) -> dict | None:
     key = f"poe2:{league}"
@@ -72,6 +113,46 @@ def fetch_poe1(league: str, force: bool = False) -> dict | None:
         return _cache.get(key)
 
 
+# ---------------------------------------------------------------------------
+# Raw fetch functions (item overview)
+# ---------------------------------------------------------------------------
+
+def fetch_item_overview(game_version: str, league: str, category: str, force: bool = False) -> dict | None:
+    """
+    Fetch item overview data for a given category.
+    Fragment uses the currency overview endpoint for PoE1.
+    """
+    key = f"{game_version}:{league}:item:{category}"
+    if not force and _rate_limited(key) and key in _cache:
+        return _cache[key]
+
+    try:
+        if game_version == "poe2":
+            url = POE2_ITEM_OVERVIEW_URL
+            params = {"leagueName": league, "type": category}
+        elif category == "Fragment":
+            # PoE1 fragments use the currency overview endpoint
+            url = POE1_OVERVIEW_URL
+            params = {"league": league, "type": "Fragment"}
+        else:
+            url = POE1_ITEM_OVERVIEW_URL
+            params = {"league": league, "type": category}
+
+        resp = requests.get(url, params=params, timeout=10)
+        resp.raise_for_status()
+        data = resp.json()
+        _cache[key] = data
+        _last_fetch[key] = time.time()
+        return data
+    except Exception as e:
+        logger.error("poe.ninja item overview fetch failed (%s/%s): %s", game_version, category, e)
+        return _cache.get(key)
+
+
+# ---------------------------------------------------------------------------
+# Parse functions (currency exchange — existing)
+# ---------------------------------------------------------------------------
+
 def parse_poe2(data: dict) -> tuple[dict, dict, float | None]:
     """
     Returns (exchange_rates, icons, timestamp).
@@ -81,6 +162,7 @@ def parse_poe2(data: dict) -> tuple[dict, dict, float | None]:
         'buy':  Chaos you pay to get 1 unit of this currency,
         'chaos_eq': midpoint chaos value,
         'volume': listing count,
+        'category': 'Currency',
     }
 
     PoE2 only provides a single midpoint price, so we apply a small
@@ -117,12 +199,13 @@ def parse_poe2(data: dict) -> tuple[dict, dict, float | None]:
             "buy": mid * (1.0 - POE2_IMPLICIT_HALF_SPREAD),
             "chaos_eq": mid,
             "volume": volume,
+            "category": "Currency",
         }
         if "icon" in item:
             icons[name] = item["icon"]
 
     # Chaos Orb: spread is zero (it IS the base currency)
-    rates["Chaos Orb"] = {"sell": 1.0, "buy": 1.0, "chaos_eq": 1.0, "volume": 9999}
+    rates["Chaos Orb"] = {"sell": 1.0, "buy": 1.0, "chaos_eq": 1.0, "volume": 9999, "category": "Currency"}
 
     return rates, icons, timestamp
 
@@ -136,6 +219,7 @@ def parse_poe1(data: dict) -> tuple[dict, dict, float | None]:
         'buy':  1/pay.value     — Chaos per unit (market ASK for this currency)
         'chaos_eq': chaosEquivalent,
         'volume': listing count,
+        'category': 'Currency',
     }
 
     Filters out currencies where only one direction (pay or receive) has data.
@@ -180,6 +264,7 @@ def parse_poe1(data: dict) -> tuple[dict, dict, float | None]:
             "buy": buy_price,
             "chaos_eq": float(chaos_eq) if chaos_eq is not None else (sell_price + buy_price) / 2,
             "volume": volume,
+            "category": "Currency",
         }
 
         detail = details_by_name.get(name, {})
@@ -187,12 +272,146 @@ def parse_poe1(data: dict) -> tuple[dict, dict, float | None]:
             icons[name] = detail["icon"]
 
     # Chaos Orb
-    rates["Chaos Orb"] = {"sell": 1.0, "buy": 1.0, "chaos_eq": 1.0, "volume": 9999}
+    rates["Chaos Orb"] = {"sell": 1.0, "buy": 1.0, "chaos_eq": 1.0, "volume": 9999, "category": "Currency"}
     if "Chaos Orb" in details_by_name and "icon" in details_by_name["Chaos Orb"]:
         icons["Chaos Orb"] = details_by_name["Chaos Orb"]["icon"]
 
     return rates, icons, timestamp
 
+
+# ---------------------------------------------------------------------------
+# Parse function (item overview — new)
+# ---------------------------------------------------------------------------
+
+def parse_item_overview(
+    data: dict,
+    category: str,
+    config_entry: dict,
+    max_items: int = 40,
+) -> tuple[dict, dict]:
+    """
+    Parse poe.ninja item overview response.
+
+    Returns (rates, icons) where:
+        rates[name] = {
+            'sell': chaosValue * (1 + spread),
+            'buy':  chaosValue * (1 - spread),
+            'chaos_eq': chaosValue,
+            'volume': listingCount,
+            'category': category,
+        }
+
+    Filters: chaosValue >= 0.5 and listingCount >= 5.
+    Sorts by listingCount desc, takes top max_items.
+
+    For Fragment (PoE1 currency overview format), falls back to chaosEquivalent.
+    """
+    rates: dict = {}
+    icons: dict = {}
+
+    if not data:
+        return rates, icons
+
+    spread = config_entry.get("spread", 0.05)
+
+    lines = data.get("lines", [])
+
+    # Handle Fragment (currency overview format) — items have currencyTypeName + chaosEquivalent
+    is_currency_fmt = bool(lines and "currencyTypeName" in lines[0]) if lines else False
+
+    parsed: list = []
+    for line in lines:
+        if is_currency_fmt:
+            name = line.get("currencyTypeName")
+            chaos_val = line.get("chaosEquivalent")
+            listing_count = (
+                (line.get("pay") or {}).get("count", 0) +
+                (line.get("receive") or {}).get("count", 0)
+            )
+            icon_url = None  # icons come from currencyDetails if needed
+        else:
+            name = line.get("name")
+            chaos_val = line.get("chaosValue")
+            listing_count = line.get("listingCount") or line.get("count") or 0
+            icon_url = line.get("icon")
+
+        if not name or chaos_val is None:
+            continue
+        chaos_val = float(chaos_val)
+        if chaos_val < 0.5:
+            continue
+        if listing_count < 5:
+            continue
+
+        parsed.append((listing_count, name, chaos_val, icon_url))
+
+    # Sort by listing count descending, take top max_items
+    parsed.sort(key=lambda x: x[0], reverse=True)
+    parsed = parsed[:max_items]
+
+    for listing_count, name, chaos_val, icon_url in parsed:
+        rates[name] = {
+            "sell": chaos_val * (1.0 + spread),
+            "buy": chaos_val * (1.0 - spread),
+            "chaos_eq": chaos_val,
+            "volume": listing_count,
+            "category": category,
+        }
+        if icon_url:
+            icons[name] = icon_url
+
+    return rates, icons
+
+
+# ---------------------------------------------------------------------------
+# Unified fetch_all entry point
+# ---------------------------------------------------------------------------
+
+def fetch_all(
+    game_version: str,
+    league: str,
+    force: bool = False,
+    max_items_per_cat: int = 40,
+) -> tuple[dict, dict, float | None]:
+    """
+    Fetch all currency and item category data in parallel.
+
+    Returns (exchange_rates, icons, timestamp) — same signature as
+    parse_poe2 / parse_poe1 but merged across all categories.
+    """
+    # 1. Fetch currency exchange data
+    if game_version == "poe2":
+        currency_data = fetch_poe2(league, force=force)
+        rates, icons, timestamp = parse_poe2(currency_data)
+        item_categories = POE2_ITEM_CATEGORIES
+    else:
+        currency_data = fetch_poe1(league, force=force)
+        rates, icons, timestamp = parse_poe1(currency_data)
+        item_categories = POE1_ITEM_CATEGORIES
+
+    # 2. Fetch item categories in parallel
+    def _fetch_category(category: str) -> tuple[str, dict, dict]:
+        data = fetch_item_overview(game_version, league, category, force=force)
+        cfg_entry = CATEGORY_CONFIG.get(category, {"spread": 0.05})
+        cat_rates, cat_icons = parse_item_overview(data, category, cfg_entry, max_items=max_items_per_cat)
+        return category, cat_rates, cat_icons
+
+    with ThreadPoolExecutor(max_workers=6) as executor:
+        futures = {executor.submit(_fetch_category, cat): cat for cat in item_categories}
+        for future in as_completed(futures):
+            try:
+                _category, cat_rates, cat_icons = future.result()
+                rates.update(cat_rates)
+                icons.update(cat_icons)
+            except Exception as e:
+                logger.error("Item category fetch/parse error: %s", e)
+
+    return rates, icons, timestamp
+
+
+# ---------------------------------------------------------------------------
+# Cache age helper
+# ---------------------------------------------------------------------------
 
 def get_data_age(game_version: str, league: str) -> float | None:
     """Returns age in seconds of cached data, or None if no cache."""

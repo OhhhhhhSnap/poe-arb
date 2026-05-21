@@ -24,6 +24,7 @@
       </div>
     </div>
     <div class="header-right">
+      <input id="item-search" type="text" class="search-input" placeholder="Search item…" autocomplete="off" spellcheck="false">
       <span id="live-indicator" class="live-dot"></span>
       <span id="last-updated" class="header-meta">—</span>
       <button id="btn-force-refresh" class="icon-btn refresh-btn" title="Force refresh">⟳</button>
@@ -58,9 +59,17 @@
 
   <!-- BASE CURRENCY QUICK FILTER -->
   <div class="base-filter-bar" id="base-filter-bar">
-    <span class="base-filter-label">Start with:</span>
+    <span class="base-filter-label">Start:</span>
     <div class="base-filter-chips" id="base-filter-chips">
       <button class="base-chip active" data-base="">All</button>
+    </div>
+  </div>
+
+  <!-- CATEGORY FILTER BAR -->
+  <div class="category-filter-bar" id="category-filter-bar">
+    <span class="base-filter-label">Segment:</span>
+    <div class="category-chips" id="category-chips">
+      <button class="cat-chip active" data-cat="">All</button>
     </div>
   </div>
 

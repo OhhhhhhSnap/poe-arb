@@ -120,13 +120,11 @@ def refresh_data(force: bool = False):
     c = cfg.get_config()
     game = c["game_version"]
     league = c["league_name"]
+    max_items = c.get("max_items_per_category", 40)
     try:
-        if game == "poe2":
-            raw = ninja_client.fetch_poe2(league, force=force)
-            rates, icons, ts = ninja_client.parse_poe2(raw)
-        else:
-            raw = ninja_client.fetch_poe1(league, force=force)
-            rates, icons, ts = ninja_client.parse_poe1(raw)
+        rates, icons, ts = ninja_client.fetch_all(
+            game, league, force=force, max_items_per_cat=max_items
+        )
 
         if not rates:
             _state["error"] = f"No data returned from poe.ninja for {league}"
@@ -224,6 +222,11 @@ def api_flips_post():
 def api_flips_delete():
     flip_tracker.clear_flips()
     return jsonify({"ok": True})
+
+
+@app.route("/api/categories")
+def api_categories():
+    return jsonify(ninja_client.CATEGORY_CONFIG)
 
 
 @app.route("/api/status")
