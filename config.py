@@ -31,6 +31,8 @@ _config = {
     "enabled_categories": [
         "Currency", "Fragment", "Scarab", "Essence", "DistilledEmotion",
         "Oil", "Fossil", "Resonator", "Incubator", "DivinationCard", "Omen", "SoulCore",
+        # Phase 2 — liquid/stackable additions (Map/BlightedMap off by default — large, thin margins)
+        "SkillGem", "DeliriumOrb", "Invitation", "Tattoo", "AllflameEmber", "Beast",
     ],
     "max_items_per_category": 40,
 }

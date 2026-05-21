@@ -53,11 +53,27 @@ CATEGORY_CONFIG = {
     "DivinationCard":   {"spread": 0.10,  "label": "Div Card",     "color": "#ef9a9a"},
     "Omen":             {"spread": 0.05,  "label": "Omen",         "color": "#80deea"},
     "SoulCore":         {"spread": 0.06,  "label": "Soul Core",    "color": "#a5d6a7"},
+    # Phase 2 additions
+    "SkillGem":         {"spread": 0.05,  "label": "Skill Gem",    "color": "#69f0ae"},
+    "DeliriumOrb":      {"spread": 0.04,  "label": "Delirium Orb", "color": "#b0bec5"},
+    "Invitation":       {"spread": 0.05,  "label": "Invitation",   "color": "#ab47bc"},
+    "Tattoo":           {"spread": 0.05,  "label": "Tattoo",       "color": "#26c6da"},
+    "AllflameEmber":    {"spread": 0.07,  "label": "Allflame",     "color": "#ff7043"},
+    "Beast":            {"spread": 0.10,  "label": "Beast",        "color": "#ff5252"},
+    "Map":              {"spread": 0.06,  "label": "Map",          "color": "#a1887f"},
+    "BlightedMap":      {"spread": 0.08,  "label": "Blt. Map",     "color": "#66bb6a"},
 }
 
 # Item categories to fetch per game version
-POE1_ITEM_CATEGORIES = ["Essence", "Scarab", "Fragment", "Oil", "Fossil", "Resonator", "Incubator", "DivinationCard"]
-POE2_ITEM_CATEGORIES = ["Essence", "Scarab", "Fragment", "DistilledEmotion", "Omen", "SoulCore", "DivinationCard"]
+POE1_ITEM_CATEGORIES = [
+    "Essence", "Scarab", "Fragment", "Oil", "Fossil", "Resonator", "Incubator",
+    "DivinationCard", "SkillGem", "DeliriumOrb", "Invitation", "Tattoo",
+    "AllflameEmber", "Beast", "Map", "BlightedMap",
+]
+POE2_ITEM_CATEGORIES = [
+    "Essence", "Scarab", "Fragment", "DistilledEmotion", "Omen", "SoulCore",
+    "DivinationCard", "SkillGem", "Map",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -342,6 +358,10 @@ def parse_item_overview(
             continue
         if listing_count < 5:
             continue
+        # SkillGem: skip levelling gems — only level 20+ have stable arb prices
+        if category == "SkillGem" and not is_currency_fmt:
+            if line.get("gemLevel", 0) < 20:
+                continue
 
         parsed.append((listing_count, name, chaos_val, icon_url))
 
@@ -396,7 +416,7 @@ def fetch_all(
         cat_rates, cat_icons = parse_item_overview(data, category, cfg_entry, max_items=max_items_per_cat)
         return category, cat_rates, cat_icons
 
-    with ThreadPoolExecutor(max_workers=6) as executor:
+    with ThreadPoolExecutor(max_workers=8) as executor:
         futures = {executor.submit(_fetch_category, cat): cat for cat in item_categories}
         for future in as_completed(futures):
             try:
