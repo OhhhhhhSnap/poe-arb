@@ -56,6 +56,14 @@
     </div>
   </details>
 
+  <!-- BASE CURRENCY QUICK FILTER -->
+  <div class="base-filter-bar" id="base-filter-bar">
+    <span class="base-filter-label">Start with:</span>
+    <div class="base-filter-chips" id="base-filter-chips">
+      <button class="base-chip active" data-base="">All</button>
+    </div>
+  </div>
+
   <!-- MAIN LAYOUT -->
   <div class="main-layout">
     <!-- CARDS AREA -->
@@ -75,6 +83,10 @@
         <!-- SETTINGS -->
         <section class="settings-panel">
           <div class="panel-title">// FILTERS</div>
+          <label class="setting-row">
+            <span class="setting-label">Base Currency</span>
+            <input type="text" id="s-base-currency" class="setting-input" placeholder="Any (e.g. Divine Orb)">
+          </label>
           <label class="setting-row">
             <span class="setting-label">Min Margin %</span>
             <input type="number" id="s-min-margin" class="setting-input" step="0.5" min="0">

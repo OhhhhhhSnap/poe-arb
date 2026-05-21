@@ -12,6 +12,7 @@ NOTIFY_ON_NEW_OPPORTUNITY = os.environ.get("NOTIFY_ON_NEW_OPPORTUNITY", "true").
 NOTIFY_MIN_MARGIN_PCT = float(os.environ.get("NOTIFY_MIN_MARGIN_PCT", 5.0))
 BIND_ALL_INTERFACES = os.environ.get("BIND_ALL_INTERFACES", "false").lower() == "true"
 SOUND_ALERTS = os.environ.get("SOUND_ALERTS", "true").lower() == "true"
+PREFERRED_BASE = os.environ.get("PREFERRED_BASE", "")  # "" = show all starts
 
 _config = {
     "game_version": GAME_VERSION,
@@ -26,6 +27,7 @@ _config = {
     "notify_min_margin_pct": NOTIFY_MIN_MARGIN_PCT,
     "bind_all_interfaces": BIND_ALL_INTERFACES,
     "sound_alerts": SOUND_ALERTS,
+    "preferred_base": PREFERRED_BASE,
 }
 
 
@@ -39,6 +41,7 @@ def update_config(updates: dict):
         "min_margin_pct", "min_absolute_profit_chaos", "min_volume",
         "max_hop_depth", "discord_webhook_url", "notify_on_new_opportunity",
         "notify_min_margin_pct", "bind_all_interfaces", "sound_alerts",
+        "preferred_base",
     }
     for k, v in updates.items():
         if k in allowed:

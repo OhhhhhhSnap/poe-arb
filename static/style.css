@@ -869,3 +869,72 @@ details[open] .calc-toggle { color: var(--gold); }
   letter-spacing: 0.05em;
   margin-left: auto;
 }
+
+/* === BASE CURRENCY FILTER BAR === */
+.base-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-muted);
+  padding: 0.5rem 1.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.base-filter-bar::-webkit-scrollbar { display: none; }
+
+.base-filter-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-sec);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.base-filter-chips {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: nowrap;
+}
+
+.base-chip {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: none;
+  color: var(--text-sec);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+
+.base-chip:hover { border-color: var(--gold-dim); color: var(--gold); }
+.base-chip.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(200, 168, 75, 0.1);
+}
+
+/* === BASE CURRENCY BADGE ON CARD === */
+.base-badge {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  color: var(--text-sec);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.1rem 0.35rem;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.base-badge .base-icon {
+  width: 12px;
+  height: 12px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 3px;
+  border-radius: 1px;
+}

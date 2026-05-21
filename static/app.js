@@ -13,6 +13,7 @@ const state = {
   budget: 1000,
   currentModal: null,
   knownIds: new Set(),
+  activeBase: '',  // '' = show all base currencies
 };
 
 // === AUDIO ===
@@ -162,18 +163,57 @@ function handleOpportunitiesData(data) {
     document.getElementById('stat-age').textContent = `${data.data_age_seconds}s`;
   }
 
+  updateBaseFilterChips();
   renderCards(brandNew.map(o => o.id));
   updateStatBar();
   renderCalcResults();
+}
+
+// === BASE FILTER CHIPS ===
+function updateBaseFilterChips() {
+  const bar = document.getElementById('base-filter-chips');
+  if (!bar) return;
+
+  // Collect unique base currencies from current opportunities
+  const bases = ['', ...new Set(state.opportunities.map(o => o.base_currency).filter(Boolean))];
+
+  // Preserve active selection if still valid
+  if (state.activeBase && !bases.includes(state.activeBase)) {
+    state.activeBase = '';
+  }
+
+  bar.innerHTML = '';
+  bases.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'base-chip' + (state.activeBase === b ? ' active' : '');
+    btn.dataset.base = b;
+    btn.textContent = b || 'All';
+    btn.addEventListener('click', () => {
+      state.activeBase = b;
+      updateBaseFilterChips();
+      renderCards();
+    });
+    bar.appendChild(btn);
+  });
+}
+
+function visibleOpportunities() {
+  if (!state.activeBase) return state.opportunities;
+  return state.opportunities.filter(o => o.base_currency === state.activeBase);
 }
 
 // === RENDER CARDS ===
 function renderCards(newIds = []) {
   const area = document.getElementById('cards-area');
   const empty = document.getElementById('empty-state');
+  const visible = visibleOpportunities();
 
-  if (state.opportunities.length === 0) {
+  if (visible.length === 0) {
     empty.style.display = 'flex';
+    empty.querySelector('.empty-title').textContent =
+      state.activeBase
+        ? `No opportunities starting with ${state.activeBase}`
+        : 'Scanning for opportunities...';
     // Remove all cards except empty state
     [...area.children].forEach(c => {
       if (c !== empty) c.remove();
@@ -189,10 +229,10 @@ function renderCards(newIds = []) {
   });
 
   const rendered = new Set();
-  state.opportunities.forEach((opp, idx) => {
+  visible.forEach((opp, idx) => {
     rendered.add(opp.id);
     let card = existingById[opp.id];
-    const isNew = newIds.includes(opp.id);
+    const isNew = newIds ? newIds.includes(opp.id) : false;
     if (!card) {
       card = buildCard(opp, isNew);
       // Insert at correct position
@@ -237,8 +277,10 @@ function cardHtml(opp) {
   const budget = state.budget || 1000;
   const calcProfit = (budget * opp.absolute_profit_chaos).toFixed(1);
   const spottedAgo = timeSince(opp.spotted_at);
+  const base = opp.base_currency || 'Chaos Orb';
+  const baseIcon = opp.icons && opp.icons[0] ? opp.icons[0] : '';
 
-  // Path icons
+  // Path icons — show all nodes in the cycle, including repeated start at end
   let pathHtml = '';
   opp.path.forEach((cur, i) => {
     if (i > 0) pathHtml += '<span class="path-arrow">→</span>';
@@ -248,6 +290,11 @@ function cardHtml(opp) {
       pathHtml += `<span class="path-label" title="${escHtml(cur)}">${escHtml(cur.split(' ')[0])}</span>`;
     }
   });
+
+  // Base currency badge (only show if not "All" filter and base != Chaos)
+  const baseBadgeHtml = `<span class="base-badge">${
+    baseIcon ? `<img class="base-icon" src="${escHtml(baseIcon)}" alt="">` : ''
+  }start: ${escHtml(base)}</span>`;
 
   return `
     ${isChain ? '<span class="chain-badge">CHAIN</span>' : ''}
@@ -264,7 +311,7 @@ function cardHtml(opp) {
     </div>
     <div class="card-profit">${escHtml(opp.profit_per_trade)}</div>
     <div class="card-meta">
-      <span class="vol-pill">vol: ${opp.volume === 999 ? '—' : opp.volume}</span>
+      ${baseBadgeHtml}
       <span class="conf-dot ${opp.confidence}" title="${opp.confidence} confidence"></span>
       <span class="abs-profit">${opp.absolute_profit_chaos.toFixed(3)}c abs</span>
       <span class="spotted">${spottedAgo}</span>
@@ -354,10 +401,14 @@ function renderFlips() {
 
 // === STATS BAR ===
 function updateStatBar() {
-  const opps = state.opportunities;
-  document.getElementById('stat-opps').textContent = opps.length;
-  if (opps.length > 0) {
-    document.getElementById('stat-best').textContent = `${opps[0].margin_pct.toFixed(2)}%`;
+  const visible = visibleOpportunities();
+  const all = state.opportunities;
+  document.getElementById('stat-opps').textContent =
+    state.activeBase ? `${visible.length} / ${all.length}` : all.length;
+  if (visible.length > 0) {
+    document.getElementById('stat-best').textContent = `${visible[0].margin_pct.toFixed(2)}%`;
+  } else if (all.length > 0) {
+    document.getElementById('stat-best').textContent = `${all[0].margin_pct.toFixed(2)}%`;
   } else {
     document.getElementById('stat-best').textContent = '—';
   }
@@ -370,16 +421,20 @@ function renderCalcResults() {
   state.budget = budget;
   const container = document.getElementById('calc-results');
   container.innerHTML = '';
-  state.opportunities.slice(0, 8).forEach(opp => {
+  const visible = visibleOpportunities();
+  visible.slice(0, 8).forEach(opp => {
     const profit = (budget * opp.absolute_profit_chaos).toFixed(1);
     const chip = document.createElement('div');
     chip.className = 'calc-chip';
-    chip.textContent = `${opp.path[0]}→${opp.path[opp.path.length - 1]}: ~${profit}c`;
+    const label = opp.base_currency !== 'Chaos Orb'
+      ? `${opp.base_currency.split(' ')[0]}→…`
+      : `${opp.path[0]}→${opp.path[opp.path.length - 1]}`;
+    chip.textContent = `${label}: ~${profit}c`;
     container.appendChild(chip);
   });
   // Also update calc hints in cards
   document.querySelectorAll('.calc-profit-hint span').forEach((el, i) => {
-    const opp = state.opportunities[i];
+    const opp = visible[i];
     if (opp) {
       el.textContent = `${(budget * opp.absolute_profit_chaos).toFixed(1)}c`;
     }
@@ -389,6 +444,7 @@ function renderCalcResults() {
 // === SETTINGS ===
 function applyConfigToSettings() {
   const c = state.config;
+  setVal('s-base-currency', c.preferred_base || '');
   setVal('s-min-margin', c.min_margin_pct);
   setVal('s-min-abs', c.min_absolute_profit_chaos);
   setVal('s-min-volume', c.min_volume);
@@ -534,12 +590,17 @@ async function init() {
 
   // Apply filters
   document.getElementById('btn-apply-filters').addEventListener('click', async () => {
+    const baseCurrency = (document.getElementById('s-base-currency').value || '').trim();
     await saveConfig({
+      preferred_base: baseCurrency,
       min_margin_pct: parseFloat(document.getElementById('s-min-margin').value) || 0,
       min_absolute_profit_chaos: parseFloat(document.getElementById('s-min-abs').value) || 0,
       min_volume: parseInt(document.getElementById('s-min-volume').value) || 0,
       max_hop_depth: parseInt(document.getElementById('s-max-depth').value) || 4,
     });
+    // Sync quick-filter chip to match preferred base
+    state.activeBase = baseCurrency;
+    updateBaseFilterChips();
     await loadOpportunities();
   });
 

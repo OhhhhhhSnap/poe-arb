@@ -138,6 +138,7 @@ def refresh_data(force: bool = False):
             min_absolute_profit=c["min_absolute_profit_chaos"],
             min_volume=c["min_volume"],
             max_depth=c["max_hop_depth"],
+            preferred_base=c.get("preferred_base", ""),
         )
 
         _state["opportunities"] = opps
