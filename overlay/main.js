@@ -11,6 +11,9 @@ const path = require('path')
 // Config — override via env vars
 // ---------------------------------------------------------------------------
 const FLASK_PORT    = parseInt(process.env.FLASK_PORT    || '5000', 10)
+// PoE2 standalone + Steam both use "Path of Exile 2".
+// PoE1 standalone = "Path of Exile", Steam = "Path of Exile" as well.
+// Override with POE_WINDOW env var if your client uses a different title.
 const POE_WINDOW    = process.env.POE_WINDOW             || 'Path of Exile 2'
 // F9 toggles overlay. Change to UiohookKey.F8, .Home, etc. as desired.
 const TOGGLE_KEY    = parseInt(process.env.TOGGLE_KEYCODE || UiohookKey.F9, 10)
