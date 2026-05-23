@@ -12,161 +12,166 @@
     :root {
       --bg: #0d1117; --surface: #161b22; --surface2: #1c2128;
       --border: #30363d; --border-muted: #21262d;
-      --gold: #d4a017; --green: #3fb950; --green-dim: #238636;
-      --yellow: #d29922; --red: #f85149;
-      --text: #e6edf3; --text-sec: #7d8590; --text-link: #58a6ff;
+      --gold: #d4a017; --green: #3fb950; --yellow: #d29922; --red: #f85149;
+      --text: #e6edf3; --text-sec: #7d8590;
       --mono: 'JetBrains Mono', monospace; --sans: 'Inter', -apple-system, sans-serif;
     }
     html, body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
 
-    /* DEMO BANNER */
-    .demo-banner { background: #2d1f00; border-bottom: 1px solid #6e4c00; padding: 0.4rem 1rem; font-family: var(--mono); font-size: 0.72rem; color: #f0a500; text-align: center; letter-spacing: 0.03em; }
+    .demo-banner { background: #2d1f00; border-bottom: 1px solid #6e4c00; padding: 0.4rem 1rem; font-family: var(--mono); font-size: 0.7rem; color: #f0a500; text-align: center; }
 
     /* HEADER */
-    .app-header { display: flex; align-items: center; gap: 0.75rem; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.6rem 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
-    .app-logo { font-family: var(--mono); font-weight: 700; font-size: 1rem; color: var(--gold); letter-spacing: 0.12em; flex-shrink: 0; }
-    .version-toggle { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; flex-shrink: 0; }
-    .vtoggle { background: none; border: none; color: var(--text-sec); font-family: var(--mono); font-size: 0.72rem; padding: 0.25rem 0.6rem; cursor: pointer; transition: all 0.12s; }
+    .app-header { display: flex; align-items: center; gap: 0.6rem; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.55rem 1rem; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+    .app-logo { font-family: var(--mono); font-weight: 700; font-size: 0.95rem; color: var(--gold); letter-spacing: 0.12em; }
+    .version-toggle { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .vtoggle { background: none; border: none; color: var(--text-sec); font-family: var(--mono); font-size: 0.7rem; padding: 0.22rem 0.55rem; cursor: pointer; transition: all 0.12s; }
     .vtoggle.active { background: var(--gold); color: #000; font-weight: 700; }
-    .league-select { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: var(--sans); font-size: 0.78rem; padding: 0.28rem 0.5rem; border-radius: 6px; outline: none; flex: 1; min-width: 130px; max-width: 200px; }
-    .header-spacer { flex: 1; }
-    .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; flex-shrink: 0; }
+    .league-select { background: var(--surface); border: 1px solid var(--border); color: var(--text); font-size: 0.75rem; padding: 0.25rem 0.45rem; border-radius: 6px; outline: none; max-width: 160px; }
+    .h-spacer { flex: 1; }
+    .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .header-time { font-family: var(--mono); font-size: 0.7rem; color: var(--text-sec); }
+    .header-time { font-family: var(--mono); font-size: 0.68rem; color: var(--text-sec); }
 
     /* STATS */
     .stats-bar { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); }
-    .stat { flex: 1; padding: 0.55rem 0.5rem; text-align: center; border-right: 1px solid var(--border-muted); }
+    .stat { flex: 1; padding: 0.5rem 0.4rem; text-align: center; border-right: 1px solid var(--border-muted); }
     .stat:last-child { border-right: none; }
-    .stat-label { font-size: 0.6rem; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.08em; }
-    .stat-val { font-family: var(--mono); font-size: 0.9rem; font-weight: 600; margin-top: 0.15rem; }
+    .stat-label { font-size: 0.58rem; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.07em; }
+    .stat-val { font-family: var(--mono); font-size: 0.88rem; font-weight: 600; margin-top: 0.12rem; }
+
+    /* CATEGORY TABS */
+    .cat-nav { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; scrollbar-width: none; }
+    .cat-nav::-webkit-scrollbar { display: none; }
+    .cat-tab { font-family: var(--mono); font-size: 0.7rem; padding: 0.52rem 0.9rem; border: none; background: none; color: var(--text-sec); cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; transition: all 0.12s; flex-shrink: 0; }
+    .cat-tab:hover { color: var(--text); }
+    .cat-tab.active { color: var(--gold); border-bottom-color: var(--gold); font-weight: 600; }
+    .cat-tab .cat-count { font-size: 0.6rem; color: var(--text-sec); margin-left: 0.25rem; }
+    .cat-tab.active .cat-count { color: var(--gold); opacity: 0.7; }
+    .cat-tab.soon { opacity: 0.4; cursor: default; }
 
     /* FILTER BAR */
-    .filter-bar { display: flex; align-items: center; gap: 0.5rem; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.4rem 1rem; overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
+    .filter-bar { display: flex; align-items: center; gap: 0.45rem; background: var(--surface); border-bottom: 1px solid var(--border); padding: 0.38rem 1rem; overflow-x: auto; scrollbar-width: none; white-space: nowrap; }
     .filter-bar::-webkit-scrollbar { display: none; }
-    .filter-label { font-size: 0.7rem; color: var(--text-sec); flex-shrink: 0; }
-    .chip { font-family: var(--mono); font-size: 0.68rem; padding: 0.2rem 0.55rem; border: 1px solid var(--border); border-radius: 20px; background: none; color: var(--text-sec); cursor: pointer; transition: all 0.12s; white-space: nowrap; flex-shrink: 0; }
+    .filter-label { font-size: 0.65rem; color: var(--text-sec); flex-shrink: 0; }
+    .chip { font-family: var(--mono); font-size: 0.65rem; padding: 0.18rem 0.5rem; border: 1px solid var(--border); border-radius: 20px; background: none; color: var(--text-sec); cursor: pointer; transition: all 0.12s; flex-shrink: 0; }
     .chip:hover { border-color: var(--gold); color: var(--gold); }
     .chip.active { border-color: var(--gold); color: var(--gold); background: rgba(212,160,23,0.1); }
 
     /* CALC */
     .calc-panel { background: var(--surface); border-bottom: 1px solid var(--border); }
-    .calc-summary { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 1rem; cursor: pointer; list-style: none; width: 100%; background: none; border: none; text-align: left; }
+    .calc-summary { display: flex; align-items: center; gap: 0.45rem; padding: 0.4rem 1rem; cursor: pointer; list-style: none; }
     .calc-summary::-webkit-details-marker { display: none; }
-    .calc-caret { font-family: var(--mono); font-size: 0.65rem; color: var(--text-sec); transition: transform 0.15s; }
+    .calc-caret { font-family: var(--mono); font-size: 0.6rem; color: var(--text-sec); transition: transform 0.15s; }
     details[open] .calc-caret { transform: rotate(90deg); }
-    .calc-summary-label { font-size: 0.75rem; color: var(--text-sec); }
-    .calc-body { padding: 0.5rem 1rem 0.8rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-    .calc-input-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; }
-    .calc-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 0.78rem; padding: 0.28rem 0.45rem; border-radius: 6px; width: 90px; outline: none; }
+    .calc-lbl { font-size: 0.72rem; color: var(--text-sec); }
+    .calc-body { padding: 0.45rem 1rem 0.75rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .calc-row { display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; }
+    .calc-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 0.75rem; padding: 0.25rem 0.4rem; border-radius: 6px; width: 88px; outline: none; }
     .calc-input:focus { border-color: var(--gold); }
-    .calc-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; flex: 1; }
-    .calc-result-chip { font-family: var(--mono); font-size: 0.68rem; color: var(--green); background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.2); border-radius: 4px; padding: 0.15rem 0.4rem; }
+    .calc-chips { display: flex; flex-wrap: wrap; gap: 0.28rem; flex: 1; }
+    .calc-chip { font-family: var(--mono); font-size: 0.65rem; color: var(--green); background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.18); border-radius: 4px; padding: 0.12rem 0.38rem; }
 
-    /* LIST TABLE */
-    .list-wrap { max-width: 900px; margin: 0 auto; }
-    .list-header { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; padding: 0.45rem 1rem; font-size: 0.68rem; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.07em; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 53px; z-index: 50; }
-    .lh-right { text-align: right; }
+    /* LIST */
+    .list-wrap { max-width: 860px; margin: 0 auto; }
+    .list-header { display: grid; grid-template-columns: 1fr 72px 80px; padding: 0.4rem 1rem; font-size: 0.62rem; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.07em; border-bottom: 1px solid var(--border); background: var(--surface); position: sticky; top: 52px; z-index: 50; }
+    .lh-r { text-align: right; }
 
-    .opp-row { border-bottom: 1px solid var(--border-muted); cursor: pointer; transition: background 0.1s; }
-    .opp-row:hover { background: var(--surface); }
-    .opp-row:active { background: var(--surface2); }
+    .opp-row { border-bottom: 1px solid var(--border-muted); cursor: pointer; }
+    .opp-row:hover { background: rgba(255,255,255,0.025); }
+    .row-main { display: grid; grid-template-columns: 1fr 72px 80px; align-items: center; padding: 0.6rem 1rem; gap: 0.6rem; }
 
-    .row-main { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; padding: 0.65rem 1rem; }
+    .icon-chain { display: flex; align-items: center; gap: 2px; margin-bottom: 0.2rem; flex-wrap: wrap; }
+    .cur-img { width: 28px; height: 28px; object-fit: contain; flex-shrink: 0; image-rendering: -webkit-optimize-contrast; }
+    .cur-fb { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 4px; font-family: var(--mono); font-size: 0.55rem; font-weight: 700; flex-shrink: 0; }
+    .chain-sep { color: var(--text-sec); font-size: 0.5rem; padding: 0 1px; }
 
-    /* Icon chain */
-    .icon-chain { display: flex; align-items: center; gap: 2px; }
-    .cur-img { width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; }
-    .cur-fallback { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 4px; font-family: var(--mono); font-size: 0.6rem; font-weight: 700; flex-shrink: 0; }
-    .chain-sep { color: var(--text-sec); font-size: 0.55rem; padding: 0 1px; line-height: 30px; }
-
-    .row-info { min-width: 0; }
-    .row-name { font-size: 0.82rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 0.35rem; }
-    .row-sub { font-family: var(--mono); font-size: 0.62rem; color: var(--text-sec); margin-top: 0.18rem; display: flex; gap: 0.5rem; align-items: center; }
-    .badge-fast { font-size: 0.58rem; color: var(--yellow); border: 1px solid var(--yellow); border-radius: 3px; padding: 0.05rem 0.25rem; line-height: 1.4; flex-shrink: 0; }
-    .conf-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-    .conf-dot.high { background: var(--green); }
+    .row-sub { font-family: var(--mono); font-size: 0.6rem; color: var(--text-sec); display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap; }
+    .badge-fast { font-size: 0.55rem; color: var(--yellow); border: 1px solid var(--yellow); border-radius: 3px; padding: 0.04rem 0.22rem; }
+    .badge-new  { font-size: 0.55rem; color: var(--green);  border: 1px solid var(--green);  border-radius: 3px; padding: 0.04rem 0.22rem; }
+    .conf-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .conf-dot.high   { background: var(--green); }
     .conf-dot.medium { background: var(--yellow); }
-    .conf-dot.low { background: var(--red); }
+    .conf-dot.low    { background: var(--red); }
 
-    .row-margin { font-family: var(--mono); font-weight: 700; font-size: 0.95rem; text-align: right; white-space: nowrap; }
-    .row-margin.green { color: var(--green); }
+    .row-margin { font-family: var(--mono); font-weight: 700; font-size: 0.9rem; text-align: right; white-space: nowrap; }
+    .row-margin.green  { color: var(--green); }
     .row-margin.yellow { color: var(--yellow); }
 
-    .row-profit { font-family: var(--mono); font-size: 0.75rem; color: var(--text-sec); text-align: right; white-space: nowrap; }
-    .row-profit span { color: var(--green); }
+    .row-profit { font-family: var(--mono); font-size: 0.7rem; color: var(--green); text-align: right; white-space: nowrap; }
+    .row-profit small { color: var(--text-sec); font-size: 0.58rem; }
 
-    /* EXPANDED DETAILS */
-    .row-details { display: none; padding: 0.1rem 1rem 0.85rem 1rem; border-top: 1px solid var(--border-muted); background: rgba(0,0,0,0.15); }
+    /* EXPANDED */
+    .row-details { display: none; padding: 0.15rem 1rem 0.75rem; background: rgba(0,0,0,0.18); border-top: 1px solid var(--border-muted); }
     .row-details.open { display: block; }
-    .detail-rates { font-family: var(--mono); font-size: 0.73rem; color: var(--text-sec); margin-bottom: 0.5rem; line-height: 1.7; }
-    .detail-rates span { color: var(--text); }
-    .detail-meta { font-family: var(--mono); font-size: 0.68rem; color: var(--text-sec); margin-bottom: 0.6rem; }
-    .detail-actions { display: flex; gap: 0.5rem; }
-    .btn-whisper { flex: 1; font-family: var(--mono); font-size: 0.72rem; padding: 0.38rem 0.5rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--gold); color: var(--gold); background: none; transition: all 0.12s; }
-    .btn-whisper:hover, .btn-whisper.copied { background: var(--gold); color: #000; }
-    .btn-log { flex: 1; font-family: var(--mono); font-size: 0.72rem; padding: 0.38rem 0.5rem; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); color: var(--text-sec); background: none; transition: all 0.12s; }
-    .btn-log:hover { border-color: var(--green); color: var(--green); }
+    .det-rates { font-family: var(--mono); font-size: 0.7rem; color: var(--text-sec); line-height: 1.8; margin-bottom: 0.4rem; }
+    .det-rates span { color: var(--text); }
+    .det-meta { font-family: var(--mono); font-size: 0.63rem; color: var(--text-sec); margin-bottom: 0.55rem; }
+    .det-actions { display: flex; gap: 0.45rem; }
+    .btn-w { flex: 1; font-family: var(--mono); font-size: 0.7rem; padding: 0.35rem; border-radius: 6px; border: 1px solid var(--gold); color: var(--gold); background: none; cursor: pointer; transition: all 0.12s; }
+    .btn-w:hover, .btn-w.copied { background: var(--gold); color: #000; }
+    .btn-l { flex: 1; font-family: var(--mono); font-size: 0.7rem; padding: 0.35rem; border-radius: 6px; border: 1px solid var(--border); color: var(--text-sec); background: none; cursor: pointer; transition: all 0.12s; }
+    .btn-l:hover { border-color: var(--green); color: var(--green); }
+
+    /* EMPTY / SOON */
+    .empty-state { padding: 3rem 1rem; text-align: center; color: var(--text-sec); font-family: var(--mono); font-size: 0.8rem; line-height: 2; }
+    .empty-state strong { color: var(--text); display: block; font-size: 0.9rem; margin-bottom: 0.5rem; }
 
     /* MODAL */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: flex-end; justify-content: center; z-index: 500; }
-    .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px 12px 0 0; padding: 1.5rem; width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 1rem; }
-    .modal-title { font-family: var(--mono); font-weight: 700; color: var(--gold); font-size: 0.9rem; }
-    .modal-path { font-family: var(--mono); font-size: 0.75rem; color: var(--text-sec); }
-    .modal-label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.78rem; color: var(--text-sec); }
-    .modal-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 0.88rem; padding: 0.4rem 0.6rem; border-radius: 6px; outline: none; width: 100%; }
+    .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px 12px 0 0; padding: 1.4rem; width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 0.9rem; }
+    .modal-title { font-family: var(--mono); font-weight: 700; color: var(--gold); font-size: 0.88rem; }
+    .modal-path { font-family: var(--mono); font-size: 0.72rem; color: var(--text-sec); }
+    .modal-label { display: flex; flex-direction: column; gap: 0.28rem; font-size: 0.75rem; color: var(--text-sec); }
+    .modal-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: var(--mono); font-size: 0.85rem; padding: 0.38rem 0.55rem; border-radius: 6px; outline: none; width: 100%; }
     .modal-input:focus { border-color: var(--gold); }
     .modal-input[readonly] { color: var(--text-sec); }
-    .modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; }
-    .modal-cancel { background: none; border: 1px solid var(--border); color: var(--text-sec); font-family: var(--mono); font-size: 0.75rem; padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; }
-    .modal-confirm { background: var(--gold); border: 1px solid var(--gold); color: #000; font-family: var(--mono); font-size: 0.75rem; font-weight: 700; padding: 0.4rem 0.9rem; border-radius: 6px; cursor: pointer; }
+    .modal-actions { display: flex; gap: 0.55rem; justify-content: flex-end; }
+    .modal-cancel  { background: none; border: 1px solid var(--border); color: var(--text-sec); font-family: var(--mono); font-size: 0.72rem; padding: 0.38rem 0.85rem; border-radius: 6px; cursor: pointer; }
+    .modal-confirm { background: var(--gold); border: 1px solid var(--gold); color: #000; font-family: var(--mono); font-size: 0.72rem; font-weight: 700; padding: 0.38rem 0.85rem; border-radius: 6px; cursor: pointer; }
     .hidden { display: none !important; }
 
-    @media (max-width: 480px) {
-      .list-header { grid-template-columns: 1fr auto; }
-      .lh-profit { display: none; }
-      .row-main { grid-template-columns: 1fr auto; }
-      .row-profit { display: none; }
+    @media (max-width: 460px) {
+      .list-header, .row-main { grid-template-columns: 1fr 68px; }
+      .lh-profit, .row-profit { display: none; }
     }
   </style>
 </head>
 <body>
 
-<div class="demo-banner">⚡ DEMO MODE — mock data · connect to poe.ninja for live arbitrage</div>
+<div class="demo-banner">⚡ DEMO MODE — mock data · real icons from web.poecdn.com · connect backend for live arb</div>
 
 <header class="app-header">
   <span class="app-logo">POE-ARB</span>
   <div class="version-toggle">
-    <button class="vtoggle active">PoE2</button>
-    <button class="vtoggle">PoE1</button>
+    <button class="vtoggle active" data-ver="poe2">PoE2</button>
+    <button class="vtoggle" data-ver="poe1">PoE1</button>
   </div>
-  <select class="league-select">
-    <option>Fate of the Vaal</option>
-    <option>Standard</option>
+  <select class="league-select" id="league-select">
+    <option value="poe2">Fate of the Vaal</option>
+    <option value="poe2">Standard (PoE2)</option>
+    <option value="poe1" disabled>── PoE1 ──</option>
+    <option value="poe1">Settlers of Kalguur</option>
+    <option value="poe1">Standard (PoE1)</option>
   </select>
-  <div class="header-spacer"></div>
+  <div class="h-spacer"></div>
   <span class="live-dot"></span>
-  <span class="header-time" id="header-time">--:--:--</span>
+  <span class="header-time" id="htime">--:--:--</span>
 </header>
 
 <div class="stats-bar">
-  <div class="stat">
-    <div class="stat-label">Opportunities</div>
-    <div class="stat-val" id="stat-opps">8</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Best Margin</div>
-    <div class="stat-val" style="color:var(--green)" id="stat-best">+9.20%</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Session Profit</div>
-    <div class="stat-val" id="stat-session">+8.2c</div>
-  </div>
-  <div class="stat">
-    <div class="stat-label">Data Age</div>
-    <div class="stat-val" id="stat-age">18s</div>
-  </div>
+  <div class="stat"><div class="stat-label">Opps</div><div class="stat-val" id="s-opps">—</div></div>
+  <div class="stat"><div class="stat-label">Best</div><div class="stat-val" style="color:var(--green)" id="s-best">—</div></div>
+  <div class="stat"><div class="stat-label">Session</div><div class="stat-val" id="s-session">+8.2c</div></div>
+  <div class="stat"><div class="stat-label">Age</div><div class="stat-val" id="s-age">18s</div></div>
 </div>
+
+<nav class="cat-nav" id="cat-nav">
+  <button class="cat-tab active" data-cat="currency">Currency <span class="cat-count" id="cnt-currency"></span></button>
+  <button class="cat-tab" data-cat="fragment">Fragments <span class="cat-count" id="cnt-fragment"></span></button>
+  <button class="cat-tab soon" title="Requires PoE Trade API — coming soon">Scarabs</button>
+  <button class="cat-tab soon" title="Requires PoE Trade API — coming soon">Div Cards</button>
+  <button class="cat-tab soon" title="Requires PoE Trade API — coming soon">Skill Gems</button>
+</nav>
 
 <div class="filter-bar">
   <span class="filter-label">Start:</span>
@@ -176,12 +181,10 @@
 <details class="calc-panel">
   <summary class="calc-summary">
     <span class="calc-caret">▶</span>
-    <span class="calc-summary-label">Profit Calculator</span>
+    <span class="calc-lbl">Profit Calculator</span>
   </summary>
   <div class="calc-body">
-    <div class="calc-input-row">
-      Budget <input id="calc-budget" type="number" value="5000" class="calc-input"> Chaos
-    </div>
+    <div class="calc-row">Budget <input id="calc-budget" type="number" value="5000" class="calc-input"> Chaos</div>
     <div class="calc-chips" id="calc-chips"></div>
   </div>
 </details>
@@ -189,8 +192,8 @@
 <div class="list-wrap">
   <div class="list-header">
     <div>Arbitrage Path</div>
-    <div class="lh-right">Margin</div>
-    <div class="lh-right lh-profit">Profit / Budget</div>
+    <div class="lh-r">Margin</div>
+    <div class="lh-r lh-profit">Profit / Budget</div>
   </div>
   <div id="opp-list"></div>
 </div>
@@ -200,12 +203,8 @@
   <div class="modal-box">
     <div class="modal-title">Log Completed Flip</div>
     <div class="modal-path" id="modal-path"></div>
-    <label class="modal-label">Expected Profit (c)
-      <input type="number" id="modal-exp" class="modal-input" readonly>
-    </label>
-    <label class="modal-label">Actual Profit (c)
-      <input type="number" id="modal-act" class="modal-input" step="0.1">
-    </label>
+    <label class="modal-label">Expected Profit (c)<input type="number" id="modal-exp" class="modal-input" readonly></label>
+    <label class="modal-label">Actual Profit (c)<input type="number" id="modal-act" class="modal-input" step="0.1"></label>
     <div class="modal-actions">
       <button class="modal-cancel" id="modal-cancel">Cancel</button>
       <button class="modal-confirm" id="modal-confirm">Log Flip</button>
@@ -216,106 +215,254 @@
 <script>
 'use strict';
 
-// ── CURRENCY ICONS (poe cdn) ───────────────────────────────────────────────
-const CDN = 'https://web.poecdn.com/image/Art/2DItems/Currency/';
-const ICON_URL = {
-  'Chaos Orb':        CDN + 'CurrencyRerollRare.png',
-  'Divine Orb':       CDN + 'CurrencyModValues.png',
-  'Exalted Orb':      CDN + 'CurrencyAddModToRare.png',
-  'Orb of Alchemy':   CDN + 'CurrencyUpgradeToRare.png',
-  'Orb of Alteration':CDN + 'CurrencyRerollMagic.png',
-  'Mirror of Kalandra':CDN + 'CurrencyDuplicate.png',
+// ── ICON MAPS (real poe cdn, version-separated) ───────────────────────────
+// Note: in the live app these come from the poe.ninja API `icon` field per item.
+const CDN = 'https://web.poecdn.com/image/Art/2DItems/';
+const ICONS = {
+  poe2: {
+    'Chaos Orb':            CDN + 'Currency/CurrencyRerollRare.png',
+    'Divine Orb':           CDN + 'Currency/CurrencyModValues.png',
+    'Exalted Orb':          CDN + 'Currency/CurrencyAddModToRare.png',
+    'Orb of Alchemy':       CDN + 'Currency/CurrencyUpgradeToRare.png',
+    'Orb of Alteration':    CDN + 'Currency/CurrencyRerollMagic.png',
+    'Regal Orb':            CDN + 'Currency/CurrencyUpgradeMagicToRare.png',
+    'Orb of Annulment':     CDN + 'Currency/AnnulOrb.png',
+    'Vaal Orb':             CDN + 'Currency/CurrencyVaal.png',
+    // Fragments (PoE2 — icons from API in real app)
+    "Simulacrum":           CDN + 'Currency/Simulacrum.png',
+    "Forgotten Realm Fragment": null,
+    "Xoph's Breachstone":   null,
+    "Tul's Breachstone":    null,
+  },
+  poe1: {
+    'Chaos Orb':            CDN + 'Currency/CurrencyRerollRare.png',
+    'Divine Orb':           CDN + 'Currency/CurrencyModValues.png',
+    'Exalted Orb':          CDN + 'Currency/CurrencyAddModToRare.png',
+    'Orb of Alchemy':       CDN + 'Currency/CurrencyUpgradeToRare.png',
+    'Orb of Alteration':    CDN + 'Currency/CurrencyRerollMagic.png',
+    'Regal Orb':            CDN + 'Currency/CurrencyUpgradeMagicToRare.png',
+    'Orb of Scouring':      CDN + 'Currency/CurrencyConvertToNormal.png',
+    'Orb of Regret':        CDN + 'Currency/CurrencyRespec.png',
+    "Jeweller's Orb":       CDN + 'Currency/CurrencyRerollSocketNumbers.png',
+    'Orb of Fusing':        CDN + 'Currency/CurrencyRerollLinks.png',
+    'Blessed Orb':          CDN + 'Currency/CurrencyImplicitMod.png',
+    'Chromatic Orb':        CDN + 'Currency/CurrencyRerollSocket.png',
+    'Vaal Orb':             CDN + 'Currency/CurrencyVaal.png',
+    // Fragments (PoE1)
+    'Sacrifice at Midnight':CDN + 'Maps/Sacrifice3.png',
+    'Sacrifice at Noon':    CDN + 'Maps/Sacrifice2.png',
+    'Sacrifice at Dusk':    CDN + 'Maps/Sacrifice1.png',
+    'Sacrifice at Dawn':    CDN + 'Maps/Sacrifice0.png',
+    'Mortal Grief':         CDN + 'Maps/MortalGrief.png',
+    'Mortal Ignorance':     CDN + 'Maps/MortalIgnorance.png',
+    'Mortal Rage':          CDN + 'Maps/MortalRage.png',
+    'Mortal Hope':          CDN + 'Maps/MortalHope.png',
+    'Pale Court Fragment':  null,
+    "Maven's Writ":         CDN + 'Maps/MavensInvitationAll.png',
+  },
 };
-const FALLBACK_COLOR = {
-  'Chaos Orb':'#c8a84b','Divine Orb':'#00e676','Exalted Orb':'#9c6fff',
-  'Orb of Alchemy':'#ff8f00','Orb of Alteration':'#4fc3f7',
-};
+
 const ABBR = {
-  'Chaos Orb':'C','Divine Orb':'D','Exalted Orb':'Ex',
-  'Orb of Alchemy':'Al','Orb of Alteration':'Alt',
+  'Chaos Orb':'C', 'Divine Orb':'D', 'Exalted Orb':'Ex',
+  'Orb of Alchemy':'Al', 'Orb of Alteration':'Alt', 'Regal Orb':'Rg',
+  'Orb of Scouring':'Sc', 'Orb of Regret':'Re', "Jeweller's Orb":'J',
+  'Orb of Fusing':'Fu', 'Blessed Orb':'Bl', 'Chromatic Orb':'Chr',
+  'Vaal Orb':'Va',
+  'Sacrifice at Midnight':'SaM', 'Sacrifice at Noon':'SaN',
+  'Sacrifice at Dusk':'SaD', 'Sacrifice at Dawn':'SaW',
+  'Mortal Grief':'MG', 'Mortal Ignorance':'MI', 'Mortal Rage':'MR', 'Mortal Hope':'MH',
+  "Maven's Writ":'MW', 'Simulacrum':'Sim',
+  'Forgotten Realm Fragment':'FRF',
+  "Xoph's Breachstone":'Xph', "Tul's Breachstone":'Tul',
+  'Pale Court Fragment':'PCF',
+};
+const FB_COL = {
+  'Chaos Orb':'#c8a84b', 'Divine Orb':'#3fb950', 'Exalted Orb':'#9c6fff',
+  'Orb of Alchemy':'#ff8f00', 'Orb of Alteration':'#4fc3f7',
+  'Regal Orb':'#ff6b9d', 'Orb of Scouring':'#8bc4ff', 'Orb of Regret':'#78a9ff',
+  "Jeweller's Orb":'#a8d8ea', 'Orb of Fusing':'#ffa07a', 'Blessed Orb':'#98d8c8',
+  'Chromatic Orb':'#ff9e80', 'Vaal Orb':'#cf6679',
+  'Sacrifice at Midnight':'#9b59b6', 'Sacrifice at Noon':'#e67e22',
+  'Sacrifice at Dusk':'#e74c3c', 'Sacrifice at Dawn':'#3498db',
+  'Mortal Grief':'#8e44ad', 'Mortal Ignorance':'#2980b9',
+  'Mortal Rage':'#c0392b', 'Mortal Hope':'#27ae60',
+  "Maven's Writ":'#e8d5b7', 'Simulacrum':'#b2ebf2',
+  'Forgotten Realm Fragment':'#7986cb', "Xoph's Breachstone":'#ef5350',
+  "Tul's Breachstone":'#42a5f5', 'Pale Court Fragment':'#ce93d8',
 };
 
 // ── MOCK DATA ──────────────────────────────────────────────────────────────
-const OPPS = [
-  { id:'c|al|c', base:'Chaos Orb',
-    path:['Chaos Orb','Orb of Alchemy','Chaos Orb'],
-    margin:9.20, abs:0.092, vol:311, conf:'high', urgency:'',
-    buy:'1 Chaos Orb = 14 Orb of Alchemy',
-    sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
-    profit:'9.200% per Chaos Orb cycled',
-    spotted: Date.now()-90000,
-    whisper:'@whisper Hi, I\'d like to buy your 14 Orb of Alchemy for my 1 Chaos Orb in Fate of the Vaal.' },
-  { id:'c|d|ex|c', base:'Chaos Orb',
-    path:['Chaos Orb','Divine Orb','Exalted Orb','Chaos Orb'],
-    margin:7.42, abs:0.0742, vol:142, conf:'high', urgency:'FAST',
-    buy:'1 Chaos Orb = 0.0000198 Divine Orb',
-    sell:'1 Exalted Orb = 0.155 Chaos Orb',
-    profit:'7.420% per Chaos Orb cycled',
-    spotted: Date.now()-45000,
-    whisper:'@whisper Hi, I\'d like to buy your 1 Divine Orb for my 50505 Chaos Orb in Fate of the Vaal.' },
-  { id:'d|ex|al|d', base:'Divine Orb',
-    path:['Divine Orb','Exalted Orb','Orb of Alchemy','Divine Orb'],
-    margin:6.81, abs:3483.5, vol:88, conf:'high', urgency:'FAST',
-    buy:'1 Divine Orb = 363636 Exalted Orb',
-    sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
-    profit:'6.810% per Divine Orb cycled',
-    spotted: Date.now()-22000,
-    whisper:'@whisper Hi, I\'d like to buy your 363636 Exalted Orb for my 1 Divine Orb in Fate of the Vaal.' },
-  { id:'ex|al|alt|ex', base:'Exalted Orb',
-    path:['Exalted Orb','Orb of Alchemy','Orb of Alteration','Exalted Orb'],
-    margin:5.14, abs:0.0203, vol:57, conf:'medium', urgency:'FAST',
-    buy:'1 Exalted Orb = 0.561 Orb of Alchemy',
-    sell:'1 Orb of Alteration = 0.042 Chaos Orb',
-    profit:'5.140% per Exalted Orb cycled',
-    spotted: Date.now()-12000,
-    whisper:'@whisper Hi, I\'d like to buy your 1 Orb of Alchemy for my 2 Exalted Orb in Fate of the Vaal.' },
-  { id:'c|alt|al|c', base:'Chaos Orb',
-    path:['Chaos Orb','Orb of Alteration','Orb of Alchemy','Chaos Orb'],
-    margin:4.58, abs:0.0458, vol:209, conf:'medium', urgency:'',
-    buy:'1 Chaos Orb = 28 Orb of Alteration',
-    sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
-    profit:'4.580% per Chaos Orb cycled',
-    spotted: Date.now()-300000,
-    whisper:'@whisper Hi, I\'d like to buy your 28 Orb of Alteration for my 1 Chaos Orb in Fate of the Vaal.' },
-  { id:'d|al|d', base:'Divine Orb',
-    path:['Divine Orb','Orb of Alchemy','Divine Orb'],
-    margin:3.88, abs:1981.4, vol:162, conf:'high', urgency:'',
-    buy:'1 Divine Orb = 714.3 Orb of Alchemy',
-    sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
-    profit:'3.880% per Divine Orb cycled',
-    spotted: Date.now()-420000,
-    whisper:'@whisper Hi, I\'d like to buy your 714 Orb of Alchemy for my 1 Divine Orb in Fate of the Vaal.' },
-  { id:'c|d|c', base:'Chaos Orb',
-    path:['Chaos Orb','Divine Orb','Chaos Orb'],
-    margin:3.67, abs:0.0367, vol:382, conf:'high', urgency:'',
-    buy:'1 Chaos Orb = 0.0000198 Divine Orb',
-    sell:'1 Divine Orb = 52360 Chaos Orb',
-    profit:'3.670% per Chaos Orb cycled',
-    spotted: Date.now()-180000,
-    whisper:'@whisper Hi, I\'d like to buy your 1 Divine Orb for my 50505 Chaos Orb in Fate of the Vaal.' },
-  { id:'c|d|alt|al|c', base:'Chaos Orb',
-    path:['Chaos Orb','Divine Orb','Orb of Alteration','Orb of Alchemy','Chaos Orb'],
-    margin:3.21, abs:0.0321, vol:38, conf:'low', urgency:'FAST',
-    buy:'1 Chaos Orb = 0.0000198 Divine Orb',
-    sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
-    profit:'3.210% per Chaos Orb cycled',
-    spotted: Date.now()-8000,
-    whisper:'@whisper Hi, I\'d like to buy your 1 Divine Orb for my 50505 Chaos Orb in Fate of the Vaal.' },
-];
+const DATA = {
+  poe2: {
+    currency: [
+      { id:'c|al|c', base:'Chaos Orb',
+        path:['Chaos Orb','Orb of Alchemy','Chaos Orb'],
+        margin:9.20, abs:0.092, vol:311, conf:'high', urgency:'',
+        buy:'1 Chaos Orb = 14 Orb of Alchemy',
+        sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
+        spotted: Date.now()-90000,
+        whisper:"@whisper Hi, I'd like to buy your 14 Orb of Alchemy for my 1 Chaos Orb in Fate of the Vaal." },
+      { id:'c|d|ex|c', base:'Chaos Orb',
+        path:['Chaos Orb','Divine Orb','Exalted Orb','Chaos Orb'],
+        margin:7.42, abs:0.0742, vol:142, conf:'high', urgency:'FAST',
+        buy:'1 Chaos Orb = 0.0000198 Divine Orb',
+        sell:'1 Exalted Orb = 0.155 Chaos Orb',
+        spotted: Date.now()-45000,
+        whisper:"@whisper Hi, I'd like to buy your 1 Divine Orb for my 50505 Chaos Orb in Fate of the Vaal." },
+      { id:'d|ex|al|d', base:'Divine Orb',
+        path:['Divine Orb','Exalted Orb','Orb of Alchemy','Divine Orb'],
+        margin:6.81, abs:3483.5, vol:88, conf:'high', urgency:'FAST',
+        buy:'1 Divine Orb = 363636 Exalted Orb',
+        sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
+        spotted: Date.now()-22000,
+        whisper:"@whisper Hi, I'd like to buy your 363636 Exalted Orb for my 1 Divine Orb in Fate of the Vaal." },
+      { id:'ex|al|alt|ex', base:'Exalted Orb',
+        path:['Exalted Orb','Orb of Alchemy','Orb of Alteration','Exalted Orb'],
+        margin:5.14, abs:0.0203, vol:57, conf:'medium', urgency:'FAST',
+        buy:'1 Exalted Orb = 0.561 Orb of Alchemy',
+        sell:'1 Orb of Alteration = 0.042 Chaos Orb',
+        spotted: Date.now()-12000,
+        whisper:"@whisper Hi, I'd like to buy your 1 Orb of Alchemy for my 2 Exalted Orb in Fate of the Vaal." },
+      { id:'c|alt|al|c', base:'Chaos Orb',
+        path:['Chaos Orb','Orb of Alteration','Orb of Alchemy','Chaos Orb'],
+        margin:4.58, abs:0.0458, vol:209, conf:'medium', urgency:'',
+        buy:'1 Chaos Orb = 28 Orb of Alteration',
+        sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
+        spotted: Date.now()-300000,
+        whisper:"@whisper Hi, I'd like to buy your 28 Orb of Alteration for my 1 Chaos Orb in Fate of the Vaal." },
+      { id:'d|al|d', base:'Divine Orb',
+        path:['Divine Orb','Orb of Alchemy','Divine Orb'],
+        margin:3.88, abs:1981.4, vol:162, conf:'high', urgency:'',
+        buy:'1 Divine Orb = 714.3 Orb of Alchemy',
+        sell:'1 Orb of Alchemy = 0.078 Chaos Orb',
+        spotted: Date.now()-420000,
+        whisper:"@whisper Hi, I'd like to buy your 714 Orb of Alchemy for my 1 Divine Orb in Fate of the Vaal." },
+      { id:'c|d|c', base:'Chaos Orb',
+        path:['Chaos Orb','Divine Orb','Chaos Orb'],
+        margin:3.67, abs:0.0367, vol:382, conf:'high', urgency:'',
+        buy:'1 Chaos Orb = 0.0000198 Divine Orb',
+        sell:'1 Divine Orb = 52360 Chaos Orb',
+        spotted: Date.now()-180000,
+        whisper:"@whisper Hi, I'd like to buy your 1 Divine Orb for my 50505 Chaos Orb in Fate of the Vaal." },
+    ],
+    fragment: [
+      { id:'poe2|sim|frf|sim', base:'Simulacrum',
+        path:['Simulacrum','Forgotten Realm Fragment','Simulacrum'],
+        margin:8.10, abs:18.2, vol:34, conf:'medium', urgency:'FAST',
+        buy:'1 Simulacrum = 0.082 Forgotten Realm Fragment',
+        sell:'1 Forgotten Realm Fragment = 13.2 Simulacrum',
+        spotted: Date.now()-30000,
+        whisper:"@whisper I'd like to buy your Forgotten Realm Fragment for Simulacra in Fate of the Vaal." },
+      { id:'poe2|xoph|tul|xoph', base:"Xoph's Breachstone",
+        path:["Xoph's Breachstone","Tul's Breachstone","Xoph's Breachstone"],
+        margin:5.44, abs:2.1, vol:21, conf:'medium', urgency:'',
+        buy:"1 Xoph's Breachstone = 0.88 Tul's Breachstone",
+        sell:"1 Tul's Breachstone = 1.05 Xoph's Breachstone",
+        spotted: Date.now()-120000,
+        whisper:"@whisper I'd like to buy your Tul's Breachstone for Xoph's Breachstones in Fate of the Vaal." },
+      { id:'poe2|c|sim|c', base:'Chaos Orb',
+        path:['Chaos Orb','Simulacrum','Chaos Orb'],
+        margin:4.20, abs:0.042, vol:67, conf:'high', urgency:'',
+        buy:'100 Chaos Orb = 1 Simulacrum',
+        sell:'1 Simulacrum = 108 Chaos Orb',
+        spotted: Date.now()-210000,
+        whisper:"@whisper I'd like to buy your Simulacrum for 100 Chaos Orb in Fate of the Vaal." },
+    ],
+  },
+  poe1: {
+    currency: [
+      { id:'p1|c|d|c', base:'Chaos Orb',
+        path:['Chaos Orb','Divine Orb','Chaos Orb'],
+        margin:5.20, abs:0.052, vol:540, conf:'high', urgency:'',
+        buy:'1 Chaos Orb = 0.00595 Divine Orb',
+        sell:'1 Divine Orb = 178 Chaos Orb',
+        spotted: Date.now()-95000,
+        whisper:"@whisper Hi, I'd like to buy your 1 Divine Orb for my 168 Chaos Orb in Settlers." },
+      { id:'p1|c|ex|c', base:'Chaos Orb',
+        path:['Chaos Orb','Exalted Orb','Chaos Orb'],
+        margin:4.88, abs:0.0488, vol:312, conf:'high', urgency:'',
+        buy:'1 Chaos Orb = 0.0125 Exalted Orb',
+        sell:'1 Exalted Orb = 83.6 Chaos Orb',
+        spotted: Date.now()-140000,
+        whisper:"@whisper Hi, I'd like to buy your 1 Exalted Orb for my 80 Chaos Orb in Settlers." },
+      { id:'p1|ex|fus|jew|ex', base:'Exalted Orb',
+        path:['Exalted Orb','Orb of Fusing',"Jeweller's Orb",'Exalted Orb'],
+        margin:6.73, abs:5.6, vol:178, conf:'high', urgency:'FAST',
+        buy:'1 Exalted Orb = 200 Orb of Fusing',
+        sell:"1 Jeweller's Orb = 0.44 Exalted Orb",
+        spotted: Date.now()-18000,
+        whisper:"@whisper Hi, I'd like to buy your 200 Orb of Fusing for my 1 Exalted Orb in Settlers." },
+      { id:'p1|c|al|rg|c', base:'Chaos Orb',
+        path:['Chaos Orb','Orb of Alchemy','Regal Orb','Chaos Orb'],
+        margin:7.91, abs:0.0791, vol:224, conf:'high', urgency:'FAST',
+        buy:'1 Chaos Orb = 2.4 Orb of Alchemy',
+        sell:'1 Regal Orb = 2.18 Chaos Orb',
+        spotted: Date.now()-35000,
+        whisper:"@whisper Hi, I'd like to buy your 2 Orb of Alchemy for my 1 Chaos Orb in Settlers." },
+      { id:'p1|chr|fus|chr', base:'Chromatic Orb',
+        path:['Chromatic Orb','Orb of Fusing','Chromatic Orb'],
+        margin:3.55, abs:0.071, vol:680, conf:'high', urgency:'',
+        buy:'1 Chromatic Orb = 0.065 Orb of Fusing',
+        sell:'1 Orb of Fusing = 16.8 Chromatic Orb',
+        spotted: Date.now()-260000,
+        whisper:"@whisper Hi, I'd like to buy your 1 Orb of Fusing for my 15 Chromatic Orb in Settlers." },
+      { id:'p1|va|c|va', base:'Vaal Orb',
+        path:['Vaal Orb','Chaos Orb','Vaal Orb'],
+        margin:4.12, abs:0.165, vol:89, conf:'medium', urgency:'',
+        buy:'1 Vaal Orb = 4.1 Chaos Orb',
+        sell:'1 Chaos Orb = 0.262 Vaal Orb',
+        spotted: Date.now()-380000,
+        whisper:"@whisper Hi, I'd like to buy your 4 Chaos Orb for my 1 Vaal Orb in Settlers." },
+    ],
+    fragment: [
+      { id:'p1|sam|sal|sam', base:'Sacrifice at Midnight',
+        path:['Sacrifice at Midnight','Sacrifice at Noon','Sacrifice at Midnight'],
+        margin:9.30, abs:0.744, vol:88, conf:'high', urgency:'FAST',
+        buy:'1 Sacrifice at Midnight = 1.14 Sacrifice at Noon',
+        sell:'1 Sacrifice at Noon = 1.25 Sacrifice at Midnight',
+        spotted: Date.now()-28000,
+        whisper:"@whisper I'd like to buy your Sacrifice at Noon for Sacrifice at Midnight in Settlers." },
+      { id:'p1|mg|mr|mg', base:'Mortal Grief',
+        path:['Mortal Grief','Mortal Rage','Mortal Grief'],
+        margin:6.15, abs:1.23, vol:44, conf:'medium', urgency:'',
+        buy:'1 Mortal Grief = 0.94 Mortal Rage',
+        sell:'1 Mortal Rage = 1.06 Mortal Grief',
+        spotted: Date.now()-190000,
+        whisper:"@whisper I'd like to buy your Mortal Rage for Mortal Grief in Settlers." },
+      { id:'p1|mw|c|mw', base:"Maven's Writ",
+        path:["Maven's Writ",'Chaos Orb',"Maven's Writ"],
+        margin:5.80, abs:2.32, vol:31, conf:'medium', urgency:'FAST',
+        buy:"1 Maven's Writ = 38 Chaos Orb",
+        sell:'40 Chaos Orb = 1 Maven\'s Writ',
+        spotted: Date.now()-55000,
+        whisper:"@whisper I'd like to buy your Maven's Writ for 38 Chaos Orb in Settlers." },
+      { id:'p1|sad|san|sad', base:'Sacrifice at Dawn',
+        path:['Sacrifice at Dawn','Sacrifice at Dusk','Sacrifice at Dawn'],
+        margin:4.40, abs:0.132, vol:121, conf:'high', urgency:'',
+        buy:'1 Sacrifice at Dawn = 0.96 Sacrifice at Dusk',
+        sell:'1 Sacrifice at Dusk = 1.04 Sacrifice at Dawn',
+        spotted: Date.now()-340000,
+        whisper:"@whisper I'd like to buy your Sacrifice at Dusk for Sacrifice at Dawn in Settlers." },
+    ],
+  },
+};
 
 // ── STATE ──────────────────────────────────────────────────────────────────
+let version = 'poe2';
+let category = 'currency';
 let activeBase = '';
 let budget = 5000;
 
-function visible() {
-  return activeBase ? OPPS.filter(o => o.base === activeBase) : OPPS;
+function opps() {
+  const all = (DATA[version][category] || []);
+  return activeBase ? all.filter(o => o.base === activeBase) : all;
 }
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function timeSince(ts) {
+function age(ts) {
   const s = (Date.now() - ts) / 1000;
   if (s < 60) return Math.floor(s) + 's ago';
   if (s < 3600) return Math.floor(s/60) + 'm ago';
@@ -323,150 +470,178 @@ function timeSince(ts) {
 }
 
 function iconEl(name) {
-  const url = ICON_URL[name];
-  const col = FALLBACK_COLOR[name] || '#7d8590';
-  const abbr = ABBR[name] || name[0];
+  const url = (ICONS[version] || {})[name];
+  const col = FB_COL[name] || '#7d8590';
+  const abbr = ABBR[name] || name.slice(0, 3);
+  const fb = `<span class="cur-fb" style="background:rgba(0,0,0,0.3);border:1px solid ${esc(col)};color:${esc(col)};" title="${esc(name)}">${esc(abbr)}</span>`;
   if (url) {
-    return `<img class="cur-img" src="${esc(url)}" alt="${esc(name)}" title="${esc(name)}"
-      onerror="this.outerHTML='<span class=\\'cur-fallback\\' style=\\'background:rgba(125,133,144,0.15);border:1px solid ${col};color:${col};\\'>${abbr}</span>'">`; 
+    return `<img class="cur-img" src="${esc(url)}" alt="${esc(name)}" title="${esc(name)}" onerror="this.outerHTML=${JSON.stringify(fb)}">`;
   }
-  return `<span class="cur-fallback" style="background:rgba(125,133,144,0.15);border:1px solid ${col};color:${col};">${abbr}</span>`;
+  return fb;
 }
 
-function chainHtml(path) {
-  return path.map((c,i) =>
-    (i > 0 ? '<span class="chain-sep">›</span>' : '') + iconEl(c)
-  ).join('');
-}
-
-function profitLabel(opp) {
+function profitStr(opp) {
   const p = budget * opp.abs;
-  if (p >= 1000) return `~${(p/1000).toFixed(1)}k c`;
-  if (p >= 1) return `~${p.toFixed(0)}c`;
+  if (p >= 1000) return `~${(p/1000).toFixed(1)}kc`;
+  if (p >= 1) return `~${Math.round(p)}c`;
   return `~${p.toFixed(3)}c`;
 }
 
-function renderList() {
+function render() {
   const list = document.getElementById('opp-list');
-  const opps = visible();
+  const rows = opps();
 
-  list.innerHTML = opps.map(opp => {
+  if (rows.length === 0) {
+    const hasCat = DATA[version][category] && DATA[version][category].length > 0;
+    list.innerHTML = `<div class="empty-state">
+      <strong>${hasCat ? 'No results for this filter' : 'No data for this combination'}</strong>
+      ${hasCat ? 'Try "All" in the Start filter.' : 'Switch version or category.'}
+    </div>`;
+    document.getElementById('s-opps').textContent = '0';
+    document.getElementById('s-best').textContent = '—';
+    return;
+  }
+
+  list.innerHTML = rows.map(opp => {
     const mc = opp.margin >= 5 ? 'green' : 'yellow';
-    const pathLabel = opp.path.slice(0,-1).map(c => ABBR[c]||c.split(' ')[0]).join(' → ');
+    const pathLabel = opp.path.slice(0,-1).map(c => ABBR[c] || c.split(' ')[0]).join(' → ');
+    const chain = opp.path.map((c,i) => (i>0 ? '<span class="chain-sep">›</span>' : '') + iconEl(c)).join('');
 
     return `<div class="opp-row" data-id="${esc(opp.id)}">
       <div class="row-main">
-        <div class="row-info">
-          <div class="row-name">
-            <div class="icon-chain">${chainHtml(opp.path)}</div>
-          </div>
+        <div>
+          <div class="icon-chain">${chain}</div>
           <div class="row-sub">
             <span>${esc(pathLabel)}</span>
-            ${opp.urgency ? `<span class="badge-fast">${esc(opp.urgency)}</span>` : ''}
+            ${opp.urgency === 'FAST' ? '<span class="badge-fast">FAST</span>' : ''}
             <span class="conf-dot ${opp.conf}"></span>
             <span>${opp.vol} vol</span>
-            <span>${timeSince(opp.spotted)}</span>
+            <span>${age(opp.spotted)}</span>
           </div>
         </div>
         <div class="row-margin ${mc}">+${opp.margin.toFixed(2)}%</div>
-        <div class="row-profit">${profitLabel(opp)}<br><span style="color:var(--text-sec);font-size:0.6rem">/ ${budget.toLocaleString()}c</span></div>
+        <div class="row-profit">${profitStr(opp)}<br><small>/ ${Number(budget).toLocaleString()}c</small></div>
       </div>
       <div class="row-details" id="det-${esc(opp.id)}">
-        <div class="detail-rates">
+        <div class="det-rates">
           Buy: <span>${esc(opp.buy)}</span><br>
           Sell: <span>${esc(opp.sell)}</span>
         </div>
-        <div class="detail-meta">${esc(opp.profit)} · abs ${opp.abs < 1 ? opp.abs.toFixed(4) : opp.abs.toFixed(1)}c</div>
-        <div class="detail-actions">
-          <button class="btn-whisper" data-id="${esc(opp.id)}">Copy Whisper</button>
-          <button class="btn-log" data-id="${esc(opp.id)}">Log Flip</button>
+        <div class="det-meta">${opp.margin.toFixed(2)}% margin · abs ${opp.abs < 1 ? opp.abs.toFixed(4) : opp.abs.toFixed(1)}c · ${age(opp.spotted)}</div>
+        <div class="det-actions">
+          <button class="btn-w" data-id="${esc(opp.id)}">Copy Whisper</button>
+          <button class="btn-l" data-id="${esc(opp.id)}">Log Flip</button>
         </div>
       </div>
     </div>`;
   }).join('');
 
-  // row toggle
-  list.querySelectorAll('.opp-row').forEach(row => {
-    row.querySelector('.row-main').addEventListener('click', () => {
-      const det = row.querySelector('.row-details');
+  // row expand
+  list.querySelectorAll('.row-main').forEach(rm => {
+    rm.addEventListener('click', () => {
+      const det = rm.nextElementSibling;
       det.classList.toggle('open');
     });
   });
 
   // copy whisper
-  list.querySelectorAll('.btn-whisper').forEach(btn => {
+  list.querySelectorAll('.btn-w').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const opp = OPPS.find(o => o.id === btn.dataset.id);
-      if (!opp) return;
-      navigator.clipboard.writeText(opp.whisper).catch(()=>{});
+      const o = rows.find(x => x.id === btn.dataset.id);
+      if (!o) return;
+      navigator.clipboard.writeText(o.whisper).catch(()=>{});
       btn.textContent = 'Copied!'; btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'Copy Whisper'; btn.classList.remove('copied'); }, 1500);
     });
   });
 
   // log flip
-  list.querySelectorAll('.btn-log').forEach(btn => {
+  list.querySelectorAll('.btn-l').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      const opp = OPPS.find(o => o.id === btn.dataset.id);
-      if (!opp) return;
-      document.getElementById('modal-path').textContent = opp.path.join(' → ');
-      document.getElementById('modal-exp').value = (budget * opp.abs).toFixed(2);
-      document.getElementById('modal-act').value = (budget * opp.abs).toFixed(2);
+      const o = rows.find(x => x.id === btn.dataset.id);
+      if (!o) return;
+      document.getElementById('modal-path').textContent = o.path.join(' → ');
+      document.getElementById('modal-exp').value = (budget * o.abs).toFixed(2);
+      document.getElementById('modal-act').value = (budget * o.abs).toFixed(2);
       document.getElementById('log-modal').classList.remove('hidden');
       document.getElementById('modal-act').focus();
     });
   });
 
-  // update stat
-  document.getElementById('stat-opps').textContent =
-    activeBase ? `${opps.length} / ${OPPS.length}` : OPPS.length;
-
-  const best = opps.reduce((mx, o) => o.margin > mx ? o.margin : mx, 0);
-  document.getElementById('stat-best').textContent = opps.length ? `+${best.toFixed(2)}%` : '—';
+  // stats
+  const best = rows.reduce((m,o) => o.margin > m ? o.margin : m, 0);
+  document.getElementById('s-opps').textContent =
+    activeBase ? `${rows.length}/${(DATA[version][category]||[]).length}` : rows.length;
+  document.getElementById('s-best').textContent = `+${best.toFixed(2)}%`;
 }
 
 function renderChips() {
+  const all = DATA[version][category] || [];
+  const bases = ['', ...new Set(all.map(o => o.base))];
   const bar = document.getElementById('base-chips');
-  const bases = ['', ...new Set(OPPS.map(o => o.base))];
   bar.innerHTML = bases.map(b =>
-    `<button class="chip${activeBase===b?' active':''}" data-base="${esc(b)}">${b||'All'}</button>`
+    `<button class="chip${activeBase===b?' active':''}" data-base="${esc(b)}">${esc(b)||'All'}</button>`
   ).join('');
   bar.querySelectorAll('.chip').forEach(btn => {
     btn.addEventListener('click', () => {
       activeBase = btn.dataset.base;
-      renderChips();
-      renderList();
-      renderCalc();
+      renderChips(); render(); renderCalc();
     });
   });
 }
 
 function renderCalc() {
-  const opps = visible();
-  document.getElementById('calc-chips').innerHTML = opps.slice(0,5).map(o => {
+  const rows = opps();
+  document.getElementById('calc-chips').innerHTML = rows.slice(0,5).map(o => {
     const p = budget * o.abs;
-    const label = (ABBR[o.path[0]]||o.path[0].split(' ')[0]) + '→' + (ABBR[o.path[o.path.length-2]]||o.path[o.path.length-2].split(' ')[0]);
-    const val = p >= 1000 ? `${(p/1000).toFixed(1)}kc` : p >= 1 ? `${p.toFixed(0)}c` : `${p.toFixed(3)}c`;
-    return `<span class="calc-result-chip">${label}: ~${val}</span>`;
+    const label = (ABBR[o.path[0]]||o.path[0].split(' ')[0])+'→'+(ABBR[o.path[o.path.length-2]]||o.path[o.path.length-2].split(' ')[0]);
+    const val = p >= 1000 ? `${(p/1000).toFixed(1)}kc` : p >= 1 ? `${Math.round(p)}c` : `${p.toFixed(3)}c`;
+    return `<span class="calc-chip">${label}: ~${val}</span>`;
   }).join('');
 }
 
-// clock
-function tick() {
-  const now = new Date();
-  document.getElementById('header-time').textContent =
-    now.toTimeString().slice(0,8);
+function updateCatCounts() {
+  ['currency','fragment'].forEach(cat => {
+    const el = document.getElementById('cnt-'+cat);
+    if (el) el.textContent = (DATA[version][cat]||[]).length;
+  });
 }
-setInterval(tick, 1000); tick();
-setInterval(renderList, 15000);
 
-// budget input
+function fullRefresh() {
+  activeBase = '';
+  updateCatCounts();
+  renderChips();
+  render();
+  renderCalc();
+}
+
+// ── EVENTS ─────────────────────────────────────────────────────────────────
+
+// version toggle
+document.querySelectorAll('.vtoggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    version = btn.dataset.ver;
+    document.querySelectorAll('.vtoggle').forEach(b => b.classList.toggle('active', b.dataset.ver === version));
+    fullRefresh();
+  });
+});
+
+// category tabs
+document.querySelectorAll('.cat-tab:not(.soon)').forEach(tab => {
+  tab.addEventListener('click', () => {
+    category = tab.dataset.cat;
+    document.querySelectorAll('.cat-tab:not(.soon)').forEach(t => t.classList.toggle('active', t.dataset.cat === category));
+    activeBase = '';
+    renderChips(); render(); renderCalc();
+  });
+});
+
+// budget
 document.getElementById('calc-budget').addEventListener('input', e => {
   budget = Math.max(1, parseInt(e.target.value) || 1000);
-  renderList();
-  renderCalc();
+  render(); renderCalc();
 });
 
 // modal
@@ -481,10 +656,15 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.getElementById('log-modal').classList.add('hidden');
 });
 
+// clock + auto-refresh
+function tick() {
+  document.getElementById('htime').textContent = new Date().toTimeString().slice(0,8);
+}
+setInterval(tick, 1000); tick();
+setInterval(render, 15000);
+
 // init
-renderChips();
-renderList();
-renderCalc();
+fullRefresh();
 </script>
 </body>
 </html>
