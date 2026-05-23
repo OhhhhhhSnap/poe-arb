@@ -465,6 +465,18 @@ details[open] .calc-toggle::before { transform: rotate(90deg); }
   color: var(--text-muted);
 }
 
+.actual-margin {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-sec);
+}
+.actual-margin.warn { color: var(--amber); }
+.min-lot-hint {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
 .spotted {
   font-family: var(--mono);
   font-size: 0.75rem;

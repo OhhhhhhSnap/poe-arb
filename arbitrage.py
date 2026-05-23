@@ -23,6 +23,7 @@ Cycle deduplication:
 """
 import logging
 from datetime import datetime, timezone
+from fractions import Fraction
 
 logger = logging.getLogger(__name__)
 
@@ -57,14 +58,32 @@ def _confidence(volume: int, hop_count: int) -> str:
     return "low"
 
 
+def _rationalize(rate: float, max_d: int = 20) -> tuple[int, int]:
+    """Return (p, q) whole-number ratio closest to rate with q ≤ max_d.
+
+    Handles very small rates (e.g. 1/200 for Chaos→Divine) by inverting:
+    Fraction.limit_denominator collapses anything < 1/max_d to 0/1, so we
+    detect that case and return (1, round(1/rate)) instead.
+    """
+    if rate <= 0:
+        return 1, 1
+    if rate >= max_d:
+        return round(rate), 1
+    if rate < 1.0 / max_d:
+        return 1, round(1.0 / rate)
+    f = Fraction(rate).limit_denominator(max_d)
+    return f.numerator, f.denominator
+
+
 def _human_rate(name_a: str, name_b: str, exchange_rates: dict) -> str:
-    ra = exchange_rates[name_a]
-    rb = exchange_rates[name_b]
-    effective = ra["sell"] / rb["buy"]
-    if effective >= 1.0:
-        return f"1 {name_a} = {effective:.2f} {name_b}"
+    effective = exchange_rates[name_a]["sell"] / exchange_rates[name_b]["buy"]
+    p, q = _rationalize(effective)  # p B for q A
+    if q == 1:
+        return f"1 {name_a} = {p} {name_b}"
+    elif p == 1:
+        return f"{q} {name_a} = 1 {name_b}"
     else:
-        return f"{1.0 / effective:.2f} {name_a} = 1 {name_b}"
+        return f"{q} {name_a} = {p} {name_b}"
 
 
 def _trade_whisper(path: list[str], exchange_rates: dict, league: str) -> str:
@@ -75,15 +94,8 @@ def _trade_whisper(path: list[str], exchange_rates: dict, league: str) -> str:
     if a not in exchange_rates or b not in exchange_rates:
         return ""
     effective = exchange_rates[a]["sell"] / exchange_rates[b]["buy"]
-    if effective >= 1.0:
-        x, y = round(effective), 1
-        if x == 0:
-            x = 1
-    else:
-        x, y = 1, round(1.0 / effective)
-        if y == 0:
-            y = 1
-    return f"@whisper Hi, I'd like to buy your {x} {b} for my {y} {a} in {league}."
+    p, q = _rationalize(effective)  # p B for q A
+    return f"@whisper Hi, I'd like to buy your {p} {b} for my {q} {a} in {league}."
 
 
 def _rotate_to_start(inner: list[str], preferred: str) -> list[str]:
@@ -174,6 +186,19 @@ def find_opportunities(
 
             category = exchange_rates[base_currency].get("category", "Currency")
 
+            # Whole-number executable margin (2-hop only; multi-hop too complex)
+            if hop_count == 2:
+                r1 = exchange_rates[display_path[0]]["sell"] / exchange_rates[display_path[1]]["buy"]
+                r2 = exchange_rates[display_path[1]]["sell"] / exchange_rates[display_path[0]]["buy"]
+                p1, q1 = _rationalize(r1)  # trade q1 A → get p1 B
+                p2, q2 = _rationalize(r2)  # trade q2 B → get p2 A
+                a_back = (p1 * p2) // q2
+                actual_margin_pct = round((a_back - q1) / q1 * 100.0, 2) if q1 > 0 else 0.0
+                min_lot = q1
+            else:
+                actual_margin_pct = None
+                min_lot = None
+
             opp = {
                 "id": cid,
                 "type": "direct" if hop_count == 2 else "multihop",
@@ -193,6 +218,8 @@ def find_opportunities(
                 "spotted_at": spotted,
                 "trade_whisper": _trade_whisper(display_path, exchange_rates, league),
                 "urgency": "FAST" if hop_count > 3 else "",
+                "min_lot": min_lot,
+                "actual_margin_pct": actual_margin_pct,
             }
             opportunities.append(opp)
             return

@@ -413,6 +413,7 @@ function cardHtml(opp, isBest) {
     <div class="card-rates">
       <div class="rate-line">Buy: <span>${escHtml(opp.buy_rate)}</span></div>
       <div class="rate-line">Sell: <span>${escHtml(opp.sell_rate)}</span></div>
+      ${opp.actual_margin_pct != null ? `<div class="rate-line actual-margin${opp.actual_margin_pct <= 0 ? ' warn' : ''}">Executable: ${opp.actual_margin_pct > 0 ? '+' : ''}${opp.actual_margin_pct}%${opp.min_lot > 1 ? ` &nbsp;<span class="min-lot-hint">min ${opp.min_lot} ${escHtml(opp.base_currency)}</span>` : ''}</div>` : ''}
     </div>
     <div class="card-profit">${escHtml(opp.profit_per_trade)}</div>
     <div class="card-meta">
