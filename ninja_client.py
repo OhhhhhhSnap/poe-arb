@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 DEMO_MODE = os.environ.get("DEMO_MODE", "false").lower() == "true"
 
-POE2_OVERVIEW_URL = "https://poe.ninja/poe2/api/economy/currencyexchange/overview"
+POE2_OVERVIEW_URL = "https://poe.ninja/poe2/api/economy/exchange/current/overview"
 POE1_OVERVIEW_URL = "https://poe.ninja/api/data/currencyoverview"
 POE1_ITEM_OVERVIEW_URL = "https://poe.ninja/api/data/itemoverview"
 POE2_ITEM_OVERVIEW_URL = "https://poe.ninja/poe2/api/economy/item/overview"
@@ -127,7 +127,7 @@ def fetch_poe2(league: str, force: bool = False) -> dict | None:
     try:
         resp = _get_with_retry(
             POE2_OVERVIEW_URL,
-            params={"leagueName": league, "overviewName": "Currency"},
+            params={"league": league, "type": "Currency"},
         )
         data = resp.json()
         _cache[key] = data
@@ -172,7 +172,7 @@ def fetch_item_overview(game_version: str, league: str, category: str, force: bo
     try:
         if game_version == "poe2":
             url = POE2_ITEM_OVERVIEW_URL
-            params = {"leagueName": league, "type": category}
+            params = {"league": league, "type": category}
         elif category == "Fragment":
             # PoE1 fragments use the currency overview endpoint
             url = POE1_OVERVIEW_URL
