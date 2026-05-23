@@ -188,8 +188,8 @@
 </header>
 
 <div class="stats-bar">
-  <div class="stat-item"><span class="stat-label">Opportunities</span><span class="stat-value" id="stat-opps">8</span></div>
-  <div class="stat-item"><span class="stat-label">Best Margin</span><span class="stat-value" style="color:var(--green)">+7.42%</span></div>
+  <div class="stat-item"><span class="stat-label">Opportunities</span><span class="stat-value" id="stat-opps">11</span></div>
+  <div class="stat-item"><span class="stat-label">Best Margin</span><span class="stat-value" style="color:var(--green)">+10.40%</span></div>
   <div class="stat-item"><span class="stat-label">Session Profit</span><span class="stat-value" id="stat-session">142.5c</span></div>
   <div class="stat-item"><span class="stat-label">Data Age</span><span class="stat-value">18s</span></div>
 </div>
@@ -202,6 +202,11 @@
     <button class="base-chip" data-base="Divine Orb">Divine Orb</button>
     <button class="base-chip" data-base="Exalted Orb">Exalted Orb</button>
   </div>
+</div>
+
+<div class="base-filter-bar">
+  <span class="base-filter-label">Category:</span>
+  <div id="cat-chips" style="display:flex;gap:0.4rem;flex-wrap:nowrap"></div>
 </div>
 
 <details class="calc-panel">
@@ -372,10 +377,47 @@ const MOCK_OPPS = [
     spotted_at: new Date(Date.now()-8000).toISOString(),
     trade_whisper:"@whisper Hi, I'd like to buy your 1 Divine Orb for my 50505 Chaos Orb in Fate of the Vaal.",
   },
+  {
+    id:"chaos|ironrune|chaos", type:"direct", base_currency:"Chaos Orb", category:"Rune",
+    path:["Chaos Orb","Iron Rune","Chaos Orb"],
+    margin_pct:5.80, absolute_profit_chaos:0.058,
+    buy_rate:"1 Chaos Orb = 4.10 Iron Rune",
+    sell_rate:"3.87 Iron Rune = 1 Chaos Orb",
+    profit_per_trade:"5.800% per Chaos Orb cycled",
+    volume:180, confidence:"high", urgency:"",
+    icons:["","",""],
+    spotted_at: new Date(Date.now()-15000).toISOString(),
+    trade_whisper:"@whisper Hi, I'd like to buy your 4 Iron Rune for my 1 Chaos Orb in Fate of the Vaal.",
+  },
+  {
+    id:"divine|uncutskillgem|divine", type:"direct", base_currency:"Divine Orb", category:"UncutGem",
+    path:["Divine Orb","Uncut Skill Gem","Divine Orb"],
+    margin_pct:6.30, absolute_profit_chaos:11.0,
+    buy_rate:"1 Divine Orb = 8.50 Uncut Skill Gem",
+    sell_rate:"7.97 Uncut Skill Gem = 1 Divine Orb",
+    profit_per_trade:"6.300% per Divine Orb cycled",
+    volume:200, confidence:"high", urgency:"",
+    icons:["","",""],
+    spotted_at: new Date(Date.now()-35000).toISOString(),
+    trade_whisper:"@whisper Hi, I'd like to buy your 8 Uncut Skill Gem for my 1 Divine Orb in Fate of the Vaal.",
+  },
+  {
+    id:"chaos|hugeidol|chaos", type:"direct", base_currency:"Chaos Orb", category:"Idol",
+    path:["Chaos Orb","Huge Idol","Chaos Orb"],
+    margin_pct:10.40, absolute_profit_chaos:0.182,
+    buy_rate:"1 Chaos Orb = 0.57 Huge Idol",
+    sell_rate:"0.52 Huge Idol = 1 Chaos Orb",
+    profit_per_trade:"10.400% per Chaos Orb cycled",
+    volume:45, confidence:"medium", urgency:"",
+    icons:["","",""],
+    spotted_at: new Date(Date.now()-60000).toISOString(),
+    trade_whisper:"@whisper Hi, I'd like to buy your 1 Huge Idol for my 1.75 Chaos Orb in Fate of the Vaal.",
+  },
 ];
 
 // ── STATE ──────────────────────────────────────────────────────────────────
 let activeBase = '';
+let activeCat = '';
 let budget = 5000;
 let currentModal = null;
 let flips = [
@@ -385,8 +427,10 @@ let flips = [
 ];
 
 function visible() {
-  if (!activeBase) return MOCK_OPPS;
-  return MOCK_OPPS.filter(o => o.base_currency === activeBase);
+  let opps = MOCK_OPPS;
+  if (activeBase) opps = opps.filter(o => o.base_currency === activeBase);
+  if (activeCat) opps = opps.filter(o => (o.category || 'Currency') === activeCat);
+  return opps;
 }
 
 function esc(s) {
@@ -404,10 +448,18 @@ function timeSince(iso) {
 const ABBR = {
   'Chaos Orb':'C','Divine Orb':'D','Exalted Orb':'Ex',
   'Orb of Alchemy':'Al','Orb of Alteration':'Alt',
+  'Iron Rune':'Rn','Uncut Skill Gem':'UG','Huge Idol':'Id',
 };
 const COLORS = {
   'Chaos Orb':'#c8a84b','Divine Orb':'#00e676','Exalted Orb':'#9c6fff',
   'Orb of Alchemy':'#ff8f00','Orb of Alteration':'#4fc3f7',
+  'Iron Rune':'#bf360c','Uncut Skill Gem':'#26a69a','Huge Idol':'#d4a017',
+};
+const CAT_CONFIG = {
+  'Currency':  {label:'Currency',   color:'#c8a84b'},
+  'Rune':      {label:'Runes',      color:'#bf360c'},
+  'UncutGem':  {label:'Uncut Gems', color:'#26a69a'},
+  'Idol':      {label:'Idols',      color:'#d4a017'},
 };
 
 function iconHtml(name) {
@@ -449,6 +501,7 @@ function cardHtml(opp) {
     <div class="card-profit">${esc(opp.profit_per_trade)}</div>
     <div class="card-meta">
       <span class="base-badge">start: ${esc(opp.base_currency)}</span>
+      ${opp.category && opp.category !== 'Currency' ? `<span style="font-family:var(--mono);font-size:0.62rem;color:${(CAT_CONFIG[opp.category]||{color:'#6b6b8a'}).color};border:1px solid ${(CAT_CONFIG[opp.category]||{color:'#6b6b8a'}).color};border-radius:2px;padding:0.08rem 0.3rem">${(CAT_CONFIG[opp.category]||{label:opp.category}).label}</span>` : ''}
       <span class="conf-dot ${opp.confidence}"></span>
       <span class="abs-profit">${opp.absolute_profit_chaos < 1 ? opp.absolute_profit_chaos.toFixed(4) : opp.absolute_profit_chaos.toFixed(1)}c abs</span>
       <span class="spotted">${spotStr}</span>
@@ -518,8 +571,32 @@ function renderBaseChips() {
       renderBaseChips();
       renderCards();
       renderCalcChips();
+      const v = visible();
       document.getElementById('stat-opps').textContent =
-        activeBase ? `${visible().length} / ${MOCK_OPPS.length}` : MOCK_OPPS.length;
+        (activeBase || activeCat) ? `${v.length} / ${MOCK_OPPS.length}` : MOCK_OPPS.length;
+    });
+  });
+}
+
+function renderCategoryChips() {
+  const bar = document.getElementById('cat-chips');
+  const cats = [...new Set(MOCK_OPPS.map(o => o.category || 'Currency'))];
+  const allBtn = `<button class="base-chip${!activeCat?' active':''}" data-cat="">All</button>`;
+  const catBtns = cats.map(cat => {
+    const cfg = CAT_CONFIG[cat] || {label: cat, color: '#6b6b8a'};
+    const dot = `<span style="width:7px;height:7px;border-radius:50%;display:inline-block;background:${cfg.color};margin-right:3px;vertical-align:middle;flex-shrink:0"></span>`;
+    return `<button class="base-chip${activeCat===cat?' active':''}" data-cat="${esc(cat)}">${dot}${cfg.label}</button>`;
+  }).join('');
+  bar.innerHTML = allBtn + catBtns;
+  bar.querySelectorAll('.base-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCat = btn.dataset.cat;
+      renderCategoryChips();
+      renderCards();
+      renderCalcChips();
+      const v = visible();
+      document.getElementById('stat-opps').textContent =
+        (activeBase || activeCat) ? `${v.length} / ${MOCK_OPPS.length}` : MOCK_OPPS.length;
     });
   });
 }
@@ -550,6 +627,7 @@ setInterval(renderCards, 15000);
 
 // Init
 renderBaseChips();
+renderCategoryChips();
 renderCards();
 renderCalcChips();
 </script>

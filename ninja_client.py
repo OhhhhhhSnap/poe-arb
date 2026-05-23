@@ -53,7 +53,7 @@ CATEGORY_CONFIG = {
     "Fragment":         {"spread": 0.03,  "label": "Fragment",     "color": "#9c6fff"},
     "Scarab":           {"spread": 0.04,  "label": "Scarab",       "color": "#4fc3f7"},
     "Essence":          {"spread": 0.05,  "label": "Essence",      "color": "#ff8f00"},
-    "DistilledEmotion": {"spread": 0.05,  "label": "Distilled",    "color": "#e91e8c"},
+    "DistilledEmotion": {"spread": 0.05,  "label": "Liquid Emotions", "color": "#e91e8c"},
     "Oil":              {"spread": 0.06,  "label": "Oil",          "color": "#aed581"},
     "Fossil":           {"spread": 0.07,  "label": "Fossil",       "color": "#80cbc4"},
     "Resonator":        {"spread": 0.08,  "label": "Resonator",    "color": "#ce93d8"},
@@ -70,6 +70,14 @@ CATEGORY_CONFIG = {
     "Beast":            {"spread": 0.10,  "label": "Beast",        "color": "#ff5252"},
     "Map":              {"spread": 0.06,  "label": "Map",          "color": "#a1887f"},
     "BlightedMap":      {"spread": 0.08,  "label": "Blt. Map",     "color": "#66bb6a"},
+    # PoE2 additions matching poe.ninja left-nav
+    "AbyssalBone":      {"spread": 0.06,  "label": "Abyssal Bones","color": "#7e57c2"},
+    "UncutGem":         {"spread": 0.05,  "label": "Uncut Gems",   "color": "#26a69a"},
+    "LineageGem":       {"spread": 0.08,  "label": "Lineage Gems", "color": "#1565c0"},
+    "Idol":             {"spread": 0.07,  "label": "Idols",        "color": "#d4a017"},
+    "Rune":             {"spread": 0.06,  "label": "Runes",        "color": "#bf360c"},
+    "Expedition":       {"spread": 0.07,  "label": "Expedition",   "color": "#00838f"},
+    "Catalyst":         {"spread": 0.05,  "label": "Catalysts",    "color": "#558b2f"},
 }
 
 # Item categories to fetch per game version
@@ -81,6 +89,7 @@ POE1_ITEM_CATEGORIES = [
 POE2_ITEM_CATEGORIES = [
     "Essence", "Scarab", "Fragment", "DistilledEmotion", "Omen", "SoulCore",
     "DivinationCard", "SkillGem", "Map",
+    "AbyssalBone", "UncutGem", "LineageGem", "Idol", "Rune", "Expedition", "Catalyst",
 ]
 
 

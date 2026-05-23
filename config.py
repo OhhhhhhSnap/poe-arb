@@ -33,6 +33,8 @@ _config = {
         "Oil", "Fossil", "Resonator", "Incubator", "DivinationCard", "Omen", "SoulCore",
         # Phase 2 — liquid/stackable additions (Map/BlightedMap off by default — large, thin margins)
         "SkillGem", "DeliriumOrb", "Invitation", "Tattoo", "AllflameEmber", "Beast",
+        # PoE2 additions matching poe.ninja left-nav
+        "AbyssalBone", "UncutGem", "LineageGem", "Idol", "Rune", "Expedition", "Catalyst",
     ],
     "max_items_per_category": 40,
 }

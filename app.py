@@ -157,6 +157,9 @@ def _build_demo_opportunities(game_version: str) -> list[dict]:
             opp(10, ["Scarab of Divinity", "Essence of Anger", "Divine Orb", "Scarab of Divinity"],19.7, 3.5, 150, "Scarab",         "1 Scarab of Divinity = 0.92 Essence of Anger",    "1 Essence of Anger = 0.91 Scarab of Divinity"),
             opp(11, ["Abandoned Wealth", "Essence of Anger", "Chaos Orb", "Abandoned Wealth"],    35.1, 77.2,  150, "DivinationCard", "1 Abandoned Wealth = 7.96 Essence of Anger",      "7.03 Essence of Anger = 1 Abandoned Wealth"),
             opp(12, ["Divine Orb", "Chaos Orb", "Essence of Anger", "Divine Orb"],                13.9, 24.3, 9999, "Currency",       "1 Divine Orb = 177.63 Chaos Orb",                "157.00 Chaos Orb = 1 Divine Orb"),
+            opp(13, ["Chaos Orb", "Iron Rune", "Chaos Orb"],                                       5.8,   2.9,  180, "Rune",           "1 Chaos Orb = 4.10 Iron Rune",                   "3.87 Iron Rune = 1 Chaos Orb"),
+            opp(14, ["Divine Orb", "Uncut Skill Gem", "Divine Orb"],                               6.3,  11.0,  200, "UncutGem",       "1 Divine Orb = 8.50 Uncut Skill Gem",            "7.97 Uncut Skill Gem = 1 Divine Orb"),
+            opp(15, ["Chaos Orb", "Huge Idol", "Chaos Orb"],                                      10.4,   1.8,   45, "Idol",           "1 Chaos Orb = 0.57 Huge Idol",                   "0.52 Huge Idol = 1 Chaos Orb"),
         ]
 
     # PoE1 demo
