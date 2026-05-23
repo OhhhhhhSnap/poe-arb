@@ -17,6 +17,7 @@ const state = {
   activeBase: '',      // '' = show all base currencies
   activeCategory: '', // '' = show all categories
   searchQuery: '',
+  sortBy: localStorage.getItem('poe-arb:sortBy') || 'score',  // 'score' | 'margin' | 'volume'
 };
 
 // === AUDIO ===
@@ -205,6 +206,14 @@ function filteredOpportunities() {
       return pathMatch || catMatch || baseMatch;
     });
   }
+
+  // Sort
+  const sortKey = {
+    score:  o => -(o.score  ?? 0),
+    margin: o => -o.margin_pct,
+    volume: o => -o.volume,
+  }[state.sortBy] || (o => -(o.score ?? 0));
+  opps = [...opps].sort((a, b) => sortKey(a) - sortKey(b));
 
   return opps;
 }
@@ -705,6 +714,17 @@ async function init() {
     updateStatBar();
     renderCalcResults();
   });
+
+  // Sort selector
+  const sortSel = document.getElementById('sort-select');
+  if (sortSel) {
+    sortSel.value = state.sortBy;
+    sortSel.addEventListener('change', e => {
+      state.sortBy = e.target.value;
+      localStorage.setItem('poe-arb:sortBy', state.sortBy);
+      renderCards();
+    });
+  }
 
   // Apply filters
   document.getElementById('btn-apply-filters').addEventListener('click', async () => {

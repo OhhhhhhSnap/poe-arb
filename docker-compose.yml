@@ -1,0 +1,22 @@
+services:
+  poe-arb:
+    build: .
+    ports:
+      - "5001:5000"
+    restart: unless-stopped
+    environment:
+      - GAME_VERSION=${GAME_VERSION:-poe2}
+      - LEAGUE_NAME=${LEAGUE_NAME:-Fate of the Vaal}
+      - REFRESH_INTERVAL_SECONDS=${REFRESH_INTERVAL_SECONDS:-60}
+      - MIN_MARGIN_PCT=${MIN_MARGIN_PCT:-3.0}
+      - MIN_ABSOLUTE_PROFIT_CHAOS=${MIN_ABSOLUTE_PROFIT_CHAOS:-5.0}
+      - MIN_VOLUME=${MIN_VOLUME:-10}
+      - MAX_HOP_DEPTH=${MAX_HOP_DEPTH:-4}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL:-}
+      - NOTIFY_ON_NEW_OPPORTUNITY=${NOTIFY_ON_NEW_OPPORTUNITY:-true}
+      - NOTIFY_MIN_MARGIN_PCT=${NOTIFY_MIN_MARGIN_PCT:-5.0}
+      - BIND_ALL_INTERFACES=true
+      - SOUND_ALERTS=${SOUND_ALERTS:-true}
+
+volumes:
+  poe-arb-data:

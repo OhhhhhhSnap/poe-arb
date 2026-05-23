@@ -22,6 +22,7 @@ Cycle deduplication:
   sets a preferred base currency, cycles are re-rotated to start there.
 """
 import logging
+import math
 from datetime import datetime, timezone
 from fractions import Fraction
 
@@ -220,6 +221,11 @@ def find_opportunities(
                 "urgency": "FAST" if hop_count > 3 else "",
                 "min_lot": min_lot,
                 "actual_margin_pct": actual_margin_pct,
+                # Composite score: rewards high margin, high volume, low capital requirement.
+                # log(volume) softens the dominance of very liquid pairs.
+                "score": round(
+                    margin_pct * math.log1p(min_vol) / max(min_lot or 1, 1), 4
+                ),
             }
             opportunities.append(opp)
             return
