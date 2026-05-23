@@ -185,7 +185,8 @@ def refresh_data(force: bool = False):
     max_items = c.get("max_items_per_category", 40)
     try:
         rates, icons, ts = ninja_client.fetch_all(
-            game, league, force=force, max_items_per_cat=max_items
+            game, league, force=force, max_items_per_cat=max_items,
+            enabled_categories=c.get("enabled_categories"),
         )
 
         if not rates:

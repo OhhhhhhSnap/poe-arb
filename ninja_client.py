@@ -36,6 +36,11 @@ POE2_ITEM_OVERVIEW_URL = "https://poe.ninja/poe2/api/economy/item/overview"
 MIN_FETCH_INTERVAL = 30
 POE2_IMPLICIT_HALF_SPREAD = 0.015  # ±1.5% around midpoint
 
+NINJA_HEADERS = {
+    "User-Agent": "poe-arb/1.0 (github.com/ohhhhhhsnap/poe-arb)",
+    "Accept": "application/json",
+}
+
 _cache: dict = {}
 _last_fetch: dict = {}
 
@@ -88,6 +93,20 @@ def _rate_limited(key: str) -> bool:
     return (time.time() - last) < MIN_FETCH_INTERVAL
 
 
+def _get_with_retry(url: str, params: dict, timeout: int = 10, max_retries: int = 3):
+    delay = 2.0
+    for attempt in range(max_retries):
+        resp = requests.get(url, params=params, headers=NINJA_HEADERS, timeout=timeout)
+        if resp.status_code == 429 and attempt < max_retries - 1:
+            logger.warning("poe.ninja 429, retrying in %.1fs", delay)
+            time.sleep(delay)
+            delay *= 2
+        else:
+            resp.raise_for_status()
+            return resp
+    return resp
+
+
 # ---------------------------------------------------------------------------
 # Raw fetch functions (currency exchange)
 # ---------------------------------------------------------------------------
@@ -97,12 +116,10 @@ def fetch_poe2(league: str, force: bool = False) -> dict | None:
     if not force and _rate_limited(key) and key in _cache:
         return _cache[key]
     try:
-        resp = requests.get(
+        resp = _get_with_retry(
             POE2_OVERVIEW_URL,
             params={"leagueName": league, "overviewName": "Currency"},
-            timeout=10,
         )
-        resp.raise_for_status()
         data = resp.json()
         _cache[key] = data
         _last_fetch[key] = time.time()
@@ -117,12 +134,10 @@ def fetch_poe1(league: str, force: bool = False) -> dict | None:
     if not force and _rate_limited(key) and key in _cache:
         return _cache[key]
     try:
-        resp = requests.get(
+        resp = _get_with_retry(
             POE1_OVERVIEW_URL,
             params={"league": league, "type": "Currency"},
-            timeout=10,
         )
-        resp.raise_for_status()
         data = resp.json()
         _cache[key] = data
         _last_fetch[key] = time.time()
@@ -157,8 +172,7 @@ def fetch_item_overview(game_version: str, league: str, category: str, force: bo
             url = POE1_ITEM_OVERVIEW_URL
             params = {"league": league, "type": category}
 
-        resp = requests.get(url, params=params, timeout=10)
-        resp.raise_for_status()
+        resp = _get_with_retry(url, params=params)
         data = resp.json()
         _cache[key] = data
         _last_fetch[key] = time.time()
@@ -338,6 +352,14 @@ def parse_item_overview(
     # Handle Fragment (currency overview format) — items have currencyTypeName + chaosEquivalent
     is_currency_fmt = bool(lines and "currencyTypeName" in lines[0]) if lines else False
 
+    detail_icons: dict = {}
+    if is_currency_fmt:
+        detail_icons = {
+            d["name"]: d.get("icon")
+            for d in data.get("currencyDetails", [])
+            if "name" in d
+        }
+
     parsed: list = []
     for line in lines:
         if is_currency_fmt:
@@ -347,7 +369,7 @@ def parse_item_overview(
                 (line.get("pay") or {}).get("count", 0) +
                 (line.get("receive") or {}).get("count", 0)
             )
-            icon_url = None  # icons come from currencyDetails if needed
+            icon_url = detail_icons.get(name)
         else:
             name = line.get("name")
             chaos_val = line.get("chaosValue")
@@ -395,6 +417,7 @@ def fetch_all(
     league: str,
     force: bool = False,
     max_items_per_cat: int = 40,
+    enabled_categories: list | None = None,
     _demo: bool = False,
 ) -> tuple[dict, dict, float | None]:
     """
@@ -415,6 +438,9 @@ def fetch_all(
         currency_data = fetch_poe1(league, force=force)
         rates, icons, timestamp = parse_poe1(currency_data)
         item_categories = POE1_ITEM_CATEGORIES
+
+    if enabled_categories is not None:
+        item_categories = [c for c in item_categories if c in enabled_categories]
 
     # 2. Fetch item categories in parallel
     def _fetch_category(category: str) -> tuple[str, dict, dict]:
