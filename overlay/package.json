@@ -1,0 +1,53 @@
+{
+  "name": "poe-arb-overlay",
+  "version": "1.0.0",
+  "description": "poe-arb in-game Electron overlay for Path of Exile",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:win": "electron-builder --win --x64",
+    "build:linux": "electron-builder --linux --x64"
+  },
+  "dependencies": {
+    "electron-overlay-window": "^4.0.2",
+    "uiohook-napi": "^1.5.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.poe-arb.overlay",
+    "productName": "poe-arb",
+    "asar": true,
+    "files": [
+      "main.js"
+    ],
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "backend",
+        "filter": [
+          "**/*",
+          "!overlay/**",
+          "!.git/**",
+          "!__pycache__/**",
+          "!*.pyc",
+          "!*.pyo",
+          "!demo.html"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
