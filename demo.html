@@ -381,37 +381,40 @@ const MOCK_OPPS = [
     id:"chaos|ironrune|chaos", type:"direct", base_currency:"Chaos Orb", category:"Rune",
     path:["Chaos Orb","Iron Rune","Chaos Orb"],
     margin_pct:5.80, absolute_profit_chaos:0.058,
-    buy_rate:"1 Chaos Orb = 4.10 Iron Rune",
-    sell_rate:"3.87 Iron Rune = 1 Chaos Orb",
+    buy_rate:"10 Chaos Orb = 41 Iron Rune",
+    sell_rate:"19 Iron Rune = 5 Chaos Orb",
     profit_per_trade:"5.800% per Chaos Orb cycled",
     volume:180, confidence:"high", urgency:"",
     icons:["","",""],
     spotted_at: new Date(Date.now()-15000).toISOString(),
-    trade_whisper:"@whisper Hi, I'd like to buy your 4 Iron Rune for my 1 Chaos Orb in Fate of the Vaal.",
+    trade_whisper:"@whisper Hi, I'd like to buy your 41 Iron Rune for my 10 Chaos Orb in Fate of the Vaal.",
+    min_lot: 10, actual_margin_pct: 0.0,
   },
   {
     id:"divine|uncutskillgem|divine", type:"direct", base_currency:"Divine Orb", category:"UncutGem",
     path:["Divine Orb","Uncut Skill Gem","Divine Orb"],
     margin_pct:6.30, absolute_profit_chaos:11.0,
-    buy_rate:"1 Divine Orb = 8.50 Uncut Skill Gem",
-    sell_rate:"7.97 Uncut Skill Gem = 1 Divine Orb",
+    buy_rate:"2 Divine Orb = 17 Uncut Skill Gem",
+    sell_rate:"8 Uncut Skill Gem = 1 Divine Orb",
     profit_per_trade:"6.300% per Divine Orb cycled",
     volume:200, confidence:"high", urgency:"",
     icons:["","",""],
     spotted_at: new Date(Date.now()-35000).toISOString(),
-    trade_whisper:"@whisper Hi, I'd like to buy your 8 Uncut Skill Gem for my 1 Divine Orb in Fate of the Vaal.",
+    trade_whisper:"@whisper Hi, I'd like to buy your 17 Uncut Skill Gem for my 2 Divine Orb in Fate of the Vaal.",
+    min_lot: 2, actual_margin_pct: 0.0,
   },
   {
     id:"chaos|hugeidol|chaos", type:"direct", base_currency:"Chaos Orb", category:"Idol",
     path:["Chaos Orb","Huge Idol","Chaos Orb"],
     margin_pct:10.40, absolute_profit_chaos:0.182,
-    buy_rate:"1 Chaos Orb = 0.57 Huge Idol",
-    sell_rate:"0.52 Huge Idol = 1 Chaos Orb",
+    buy_rate:"7 Chaos Orb = 4 Huge Idol",
+    sell_rate:"1 Huge Idol = 2 Chaos Orb",
     profit_per_trade:"10.400% per Chaos Orb cycled",
     volume:45, confidence:"medium", urgency:"",
     icons:["","",""],
     spotted_at: new Date(Date.now()-60000).toISOString(),
-    trade_whisper:"@whisper Hi, I'd like to buy your 1 Huge Idol for my 1.75 Chaos Orb in Fate of the Vaal.",
+    trade_whisper:"@whisper Hi, I'd like to buy your 4 Huge Idol for my 7 Chaos Orb in Fate of the Vaal.",
+    min_lot: 7, actual_margin_pct: 14.3,
   },
 ];
 
@@ -497,6 +500,7 @@ function cardHtml(opp) {
     <div class="card-rates">
       <div class="rate-line">Buy: <span>${esc(opp.buy_rate)}</span></div>
       <div class="rate-line">Sell: <span>${esc(opp.sell_rate)}</span></div>
+      ${opp.actual_margin_pct != null ? `<div class="rate-line actual-margin${opp.actual_margin_pct <= 0 ? ' warn' : ''}">Executable: ${opp.actual_margin_pct > 0 ? '+' : ''}${opp.actual_margin_pct}%${opp.min_lot > 1 ? ` &nbsp;<span class="min-lot-hint">min ${opp.min_lot} ${esc(opp.base_currency)}</span>` : ''}</div>` : ''}
     </div>
     <div class="card-profit">${esc(opp.profit_per_trade)}</div>
     <div class="card-meta">
