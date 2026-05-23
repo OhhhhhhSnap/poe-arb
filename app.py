@@ -113,8 +113,6 @@ def fetch_leagues(force: bool = False):
 
     _state["leagues_fetched_at"] = now
 
-    _state["leagues_fetched_at"] = now
-
 
 def _build_demo_opportunities(game_version: str) -> list[dict]:
     now = datetime.now(timezone.utc).isoformat()

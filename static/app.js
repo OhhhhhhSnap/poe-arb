@@ -133,8 +133,7 @@ async function loadStatus() {
       el.classList.remove('lan-hidden');
     }
     const demoBanner = document.getElementById('demo-banner');
-    if (data.demo_mode) demoBanner.classList.remove('hidden');
-    else demoBanner.classList.add('hidden');
+    if (demoBanner) demoBanner.classList.toggle('hidden', !data.demo_mode);
   } catch (e) {}
 }
 

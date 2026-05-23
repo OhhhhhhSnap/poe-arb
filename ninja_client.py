@@ -498,16 +498,17 @@ def _build_demo_rates(game_version: str) -> tuple[dict, dict, float]:
     icons: dict = {}
     rates["Chaos Orb"] = {"sell": 1.0, "buy": 1.0, "chaos_eq": 1.0, "volume": 9999, "category": "Currency"}
 
-    nodes = _DEMO_NODES.get(game_version, _DEMO_NODES["poe2"])
+    gv = game_version if game_version in _DEMO_NODES else "poe2"
+    nodes = _DEMO_NODES[gv]
     for cat, items in nodes.items():
         spread = CATEGORY_CONFIG.get(cat, {"spread": 0.05})["spread"]
         for row in items:
             if cat == "Currency":
-                if game_version == "poe2":
+                if gv == "poe2":
                     name, mid = row
                     s = POE2_IMPLICIT_HALF_SPREAD
                     rates[name] = {"sell": round(mid*(1+s),4), "buy": round(mid*(1-s),4), "chaos_eq": mid, "volume": 500, "category": cat}
-                else:
+                else:  # poe1
                     name, sell, buy, eq, vol = row
                     rates[name] = {"sell": sell, "buy": buy, "chaos_eq": eq, "volume": vol, "category": cat}
             else:

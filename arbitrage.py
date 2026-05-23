@@ -137,7 +137,17 @@ def find_opportunities(
                 return
             seen_canonical.add(cid)
 
-            # Rotate to preferred base, or canonical minimum
+            # Use canonical-min node for the profit filter so the threshold is
+            # rotation-invariant regardless of preferred_base display choice.
+            canonical_base = min(inner)
+            margin_pct = (product - 1.0) * 100.0
+            abs_profit = product - 1.0  # per 1 unit of starting currency
+            abs_profit_chaos = abs_profit * exchange_rates[canonical_base]["chaos_eq"]
+
+            if margin_pct < min_margin_pct or abs_profit_chaos < min_absolute_profit:
+                return
+
+            # Rotate for display only — does not affect filtering
             if preferred_base and preferred_base in inner:
                 display_inner = _rotate_to_start(inner, preferred_base)
             else:
@@ -146,14 +156,6 @@ def find_opportunities(
 
             display_path = display_inner + [display_inner[0]]
             base_currency = display_path[0]
-
-            margin_pct = (product - 1.0) * 100.0
-            abs_profit = product - 1.0  # per 1 unit of starting currency
-            # Compare against chaos-equivalent so the threshold is meaningful
-            abs_profit_chaos = abs_profit * exchange_rates[base_currency]["chaos_eq"]
-
-            if margin_pct < min_margin_pct or abs_profit_chaos < min_absolute_profit:
-                return
 
             min_vol = min(
                 exchange_rates[c]["volume"]
