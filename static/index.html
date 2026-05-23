@@ -20,14 +20,14 @@
       </div>
       <div class="league-select-wrap">
         <select id="league-select" class="league-select"></select>
-        <button id="btn-refresh-leagues" class="icon-btn" title="Refresh leagues" aria-label="Refresh leagues">⟳</button>
+        <button id="btn-refresh-leagues" class="icon-btn" title="Refresh leagues" aria-label="Refresh leagues"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
       </div>
     </div>
     <div class="header-right">
       <input id="item-search" type="text" class="search-input" placeholder="Search item…" autocomplete="off" spellcheck="false">
       <span id="live-indicator" class="live-dot"></span>
       <span id="last-updated" class="header-meta">—</span>
-      <button id="btn-force-refresh" class="icon-btn refresh-btn" title="Force refresh" aria-label="Force refresh data">⟳</button>
+      <button id="btn-force-refresh" class="icon-btn refresh-btn" title="Force refresh" aria-label="Force refresh data"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
       <span id="lan-ip" class="header-meta lan-hidden"></span>
     </div>
   </header>
@@ -53,7 +53,7 @@
 
   <!-- PROFIT CALCULATOR -->
   <details class="calc-panel">
-    <summary class="calc-toggle">▶ Profit Calculator</summary>
+    <summary class="calc-toggle">Profit Calculator</summary>
     <div class="calc-body">
       <label class="calc-label">I have <input id="calc-budget" type="number" min="1" value="1000" class="calc-input"> Chaos</label>
       <div id="calc-results" class="calc-results"></div>
@@ -81,7 +81,7 @@
     <!-- CARDS AREA -->
     <main class="cards-area" id="cards-area">
       <div id="empty-state" class="empty-state">
-        <div class="empty-icon">◈</div>
+        <div class="empty-icon" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="2" x2="12" y2="22"/><path d="M2 8.5l10 7 10-7"/></svg></div>
         <div class="empty-title">Scanning for opportunities...</div>
         <div class="empty-sub">Data refreshes automatically. Check your league and filters.</div>
       </div>
@@ -89,7 +89,7 @@
 
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
-      <button class="sidebar-toggle" id="sidebar-toggle">⚙ Settings</button>
+      <button class="sidebar-toggle" id="sidebar-toggle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg> Settings</button>
 
       <div class="sidebar-content" id="sidebar-content">
         <!-- SETTINGS -->

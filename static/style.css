@@ -23,7 +23,8 @@ html, body {
   color: var(--text);
   font-family: var(--sans);
   font-size: 14px;
-  min-height: 100vh;
+  line-height: 1.5;
+  min-height: 100dvh;
   overflow-x: hidden;
 }
 
@@ -218,12 +219,23 @@ html, body {
   user-select: none;
   list-style: none;
   letter-spacing: 0.05em;
+  touch-action: manipulation;
 }
 
 .calc-toggle::-webkit-details-marker { display: none; }
 .calc-toggle::marker { display: none; }
 
+.calc-toggle::before {
+  content: '▶';
+  display: inline-block;
+  font-size: 0.65em;
+  margin-right: 0.4em;
+  transition: transform 0.15s ease;
+  vertical-align: middle;
+}
+
 details[open] .calc-toggle { color: var(--gold); }
+details[open] .calc-toggle::before { transform: rotate(90deg); }
 
 .calc-body {
   padding: 0.75rem 1.5rem 1rem;
@@ -279,7 +291,7 @@ details[open] .calc-toggle { color: var(--gold); }
   display: flex;
   align-items: flex-start;
   gap: 0;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100dvh - 120px);
 }
 
 /* === CARDS AREA === */
@@ -511,7 +523,7 @@ details[open] .calc-toggle { color: var(--gold); }
   min-width: 300px;
   background: var(--surface);
   border-left: 1px solid var(--border);
-  min-height: calc(100vh - 120px);
+  min-height: calc(100dvh - 120px);
   display: flex;
   flex-direction: column;
 }
@@ -812,7 +824,8 @@ details[open] .calc-toggle { color: var(--gold); }
 }
 
 @media (max-width: 768px) {
-  html, body { font-size: 15px; }
+  html, body { font-size: 16px; }
+  input, select, textarea { font-size: 16px !important; }
 
   .cards-area {
     grid-template-columns: 1fr;
@@ -1063,4 +1076,41 @@ details[open] .calc-toggle { color: var(--gold); }
   border-radius: 50%;
   display: inline-block;
   flex-shrink: 0;
+}
+
+/* === TOUCH & INTERACTION === */
+button, input, select, textarea, summary,
+.base-chip, .category-chip, .vtoggle, .icon-btn,
+.btn-whisper, .btn-log-flip, .apply-btn, .clear-btn,
+.modal-btn-cancel, .modal-btn-confirm, .sidebar-toggle,
+.toggle-switch, .scrollable-refresh {
+  touch-action: manipulation;
+}
+
+/* === FOCUS MANAGEMENT === */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* === TABULAR NUMERALS === */
+.margin-badge, .stat-value, .calc-chip, .vol-pill,
+.abs-profit, .flip-table td, .flip-total,
+.card-profit, .calc-profit-hint span {
+  font-variant-numeric: tabular-nums;
+}
+
+/* === REDUCED MOTION === */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .live-dot { opacity: 1; }
+  .opp-card:hover { transform: none; }
 }
