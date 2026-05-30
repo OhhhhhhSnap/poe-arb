@@ -16,6 +16,7 @@
     "electron": "^33.0.0",
     "electron-builder": "^26.0.0"
   },
+  "author": "poe-arb",
   "build": {
     "appId": "com.poe-arb.overlay",
     "productName": "poe-arb",
@@ -25,17 +26,12 @@
     ],
     "extraResources": [
       {
-        "from": "../",
-        "to": "backend",
-        "filter": [
-          "**/*",
-          "!overlay/**",
-          "!.git/**",
-          "!__pycache__/**",
-          "!*.pyc",
-          "!*.pyo",
-          "!demo.html"
-        ]
+        "from": "../dist/poe-arb-server.exe",
+        "to": "poe-arb-server.exe"
+      },
+      {
+        "from": "../static",
+        "to": "static"
       }
     ],
     "win": {

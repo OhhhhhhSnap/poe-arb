@@ -39,9 +39,23 @@ let gameIsFocused  = false
 // ---------------------------------------------------------------------------
 
 function spawnFlask() {
-  console.log('[overlay] spawning Flask from', BACKEND_ROOT)
-  flask = spawn('python', ['app.py'], {
-    cwd: BACKEND_ROOT,
+  const isPackaged = app.isPackaged
+  let cmd, args, cwd
+
+  if (isPackaged) {
+    // Use the PyInstaller-bundled exe — no Python needed on friends' machines
+    cmd = path.join(process.resourcesPath, 'poe-arb-server.exe')
+    args = []
+    cwd = process.resourcesPath
+  } else {
+    cmd = 'python'
+    args = ['app.py']
+    cwd = BACKEND_ROOT
+  }
+
+  console.log('[overlay] spawning Flask:', cmd)
+  flask = spawn(cmd, args, {
+    cwd,
     env: {
       ...process.env,
       BIND_ALL_INTERFACES: 'false',
