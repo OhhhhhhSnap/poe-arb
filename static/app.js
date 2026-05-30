@@ -78,7 +78,7 @@ async function loadLeagues(force) {
         { id: 'Hardcore', name: 'Hardcore', start: null, active: true },
       ],
       poe2: [
-        { id: 'Fate of the Vaal', name: 'Fate of the Vaal', start: null, active: true },
+        { id: 'Return of the Ancients', name: 'Return of the Ancients', start: null, active: true },
         { id: 'Standard', name: 'Standard', start: null, active: true },
       ],
     };

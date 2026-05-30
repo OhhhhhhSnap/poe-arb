@@ -36,7 +36,7 @@ POE1_FALLBACK = [
     {"id": "Hardcore", "name": "Hardcore", "start": None, "active": True},
 ]
 POE2_FALLBACK = [
-    {"id": "Fate of the Vaal", "name": "Fate of the Vaal", "start": None, "active": True},
+    {"id": "Return of the Ancients", "name": "Return of the Ancients", "start": None, "active": True},
     {"id": "Standard", "name": "Standard", "start": None, "active": True},
 ]
 

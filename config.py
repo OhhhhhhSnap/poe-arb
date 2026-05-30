@@ -1,7 +1,7 @@
 import os
 
 GAME_VERSION = os.environ.get("GAME_VERSION", "poe2")
-LEAGUE_NAME = os.environ.get("LEAGUE_NAME", "Fate of the Vaal")
+LEAGUE_NAME = os.environ.get("LEAGUE_NAME", "Return of the Ancients")
 REFRESH_INTERVAL_SECONDS = int(os.environ.get("REFRESH_INTERVAL_SECONDS", 60))
 MIN_MARGIN_PCT = float(os.environ.get("MIN_MARGIN_PCT", 3.0))
 MIN_ABSOLUTE_PROFIT_CHAOS = float(os.environ.get("MIN_ABSOLUTE_PROFIT_CHAOS", 0.5))

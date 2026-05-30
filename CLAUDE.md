@@ -33,7 +33,7 @@ python app.py     # http://localhost:5001
 
 ```
 GAME_VERSION=poe2               # poe2 | poe1
-LEAGUE_NAME=Fate of the Vaal
+LEAGUE_NAME=Return of the Ancients
 REFRESH_INTERVAL_SECONDS=60
 MIN_MARGIN_PCT=3.0
 MIN_ABSOLUTE_PROFIT_CHAOS=5.0
