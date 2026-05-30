@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' https://web.poecdn.com https://poe.ninja data:;" />
+  <title>PoE Arb</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Titlebar -->
+    <div id="titlebar">
+      <div class="title">
+        <span class="gem" aria-hidden="true">◆</span>
+        PoE Arb
+        <span class="f9-hint" title="Press F9 anywhere to toggle this overlay">F9</span>
+      </div>
+      <div class="actions">
+        <button id="btn-bell" aria-label="Mute notifications" title="Mute/unmute notifications">🔔</button>
+        <button id="btn-settings" aria-label="Open settings" title="Settings">⚙</button>
+        <button id="btn-close" aria-label="Close overlay" title="Close">✕</button>
+      </div>
+    </div>
+
+    <!-- Settings panel (slide-in) -->
+    <div id="settings-panel" class="settings-panel" aria-label="Settings" style="display:none">
+      <div class="settings-header">
+        <span>Settings</span>
+        <button id="btn-settings-close" aria-label="Close settings">✕</button>
+      </div>
+      <div class="settings-body">
+
+        <div class="setting-row">
+          <label for="s-min-volume">
+            Min Volume <span class="setting-unit">(divine/day)</span>
+            <span class="setting-val" id="s-min-volume-val">1.0</span>
+          </label>
+          <input type="range" id="s-min-volume" min="0" max="20" step="0.5" value="1" />
+        </div>
+
+        <div class="setting-row">
+          <label for="s-max-lot">
+            Max Lot Size <span class="setting-unit">(currency)</span>
+            <span class="setting-val" id="s-max-lot-val">200</span>
+          </label>
+          <input type="range" id="s-max-lot" min="10" max="500" step="10" value="200" />
+        </div>
+
+        <div class="setting-row">
+          <label for="s-min-margin">
+            Min Margin
+            <span class="setting-val" id="s-min-margin-val">–∞</span>
+          </label>
+          <input type="range" id="s-min-margin" min="-10" max="5" step="0.5" value="-100" />
+        </div>
+
+        <div class="setting-row">
+          <label for="s-spark-drop">
+            Sparkline Drop Filter <span class="setting-unit">(7-day)</span>
+            <span class="setting-val" id="s-spark-drop-val">−50%</span>
+          </label>
+          <input type="range" id="s-spark-drop" min="-100" max="0" step="5" value="-50" />
+        </div>
+
+        <div class="setting-row">
+          <label for="s-refresh-interval">
+            Auto-refresh every
+            <span class="setting-val" id="s-refresh-interval-val">5 min</span>
+          </label>
+          <input type="range" id="s-refresh-interval" min="1" max="30" step="1" value="5" />
+        </div>
+
+        <div class="setting-row">
+          <label for="s-notif-threshold">
+            Notify above margin
+            <span class="setting-val" id="s-notif-threshold-val">+2.0%</span>
+          </label>
+          <input type="range" id="s-notif-threshold" min="0.5" max="10" step="0.5" value="2" />
+        </div>
+
+        <button id="btn-apply-settings" class="btn-apply">Apply &amp; Refresh</button>
+        <button id="btn-reset-settings" class="btn-reset">Reset to defaults</button>
+
+        <!-- Blacklist manager -->
+        <div class="blacklist-section">
+          <button class="blacklist-toggle" id="btn-blacklist-toggle" aria-expanded="false">
+            Hidden pairs <span id="blacklist-count-badge" class="bl-count"></span>
+            <span class="bl-chevron">▸</span>
+          </button>
+          <div id="blacklist-list" class="blacklist-list" style="display:none">
+            <div id="blacklist-items"></div>
+            <div id="blacklist-empty" class="bl-empty" style="display:none">No hidden pairs</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- First-run notice (hidden by default, shown via JS on first launch) -->
+    <div id="first-run-banner" style="display:none" role="alert">
+      <span class="notice-icon" aria-hidden="true">⚠</span>
+      <span class="notice-body">
+        <strong>Windowed Fullscreen required.</strong>
+        PoE2 must run in <strong>Windowed Fullscreen</strong> mode for this overlay
+        to appear over the game. Change it in Options → Display.
+      </span>
+      <button class="notice-close" id="btn-dismiss-notice" aria-label="Dismiss notice">✕</button>
+    </div>
+
+    <!-- Controls -->
+    <div id="controls">
+      <select id="league-select" aria-label="Select league" title="Select league"></select>
+      <button id="btn-toggle-losses" class="btn-toggle active"
+              aria-label="Toggle negative-margin pairs" title="Show/hide loss pairs">Losses</button>
+      <button id="btn-refresh" aria-label="Refresh data" title="Refresh now">⟳</button>
+    </div>
+
+    <!-- Status bar -->
+    <div id="status-bar" role="status" aria-live="polite">
+      <span id="status-text">Loading…</span>
+      <div style="display:flex;align-items:center;gap:5px">
+        <span id="count-badge" class="count-badge" style="display:none" aria-label="Pair count"></span>
+        <button id="btn-legend" class="btn-legend" aria-label="Show legend" title="Legend">?</button>
+      </div>
+    </div>
+
+    <!-- Legend popup -->
+    <div id="legend-popup" class="legend-popup" style="display:none" role="dialog" aria-label="Legend">
+      <div class="legend-title">Legend</div>
+      <div class="legend-row"><span class="legend-sym">⊕N</span><span>Min lot — you need N of the base currency to start</span></div>
+      <div class="legend-row"><span class="legend-sym">N◆</span><span>Daily trading volume in divine orbs</span></div>
+      <div class="legend-row"><span class="legend-sym">+X%</span><span>Actual margin after floor arithmetic on real trade ratios</span></div>
+      <div class="legend-row"><span class="legend-sym spark-sym">▂▄▆</span><span>7-day price trend of the intermediate currency</span></div>
+      <div class="legend-row"><span class="legend-sym blue-sym">▌</span><span>Blue border = 3-hop cycle (A→B→C→A)</span></div>
+      <div class="legend-row"><span class="legend-sym">⇄</span><span>2-hop cycle — sell A for B, sell B back for A</span></div>
+      <div class="legend-divider"></div>
+      <div class="legend-row"><span class="legend-sym">Click</span><span>Open trade on poe.ninja</span></div>
+      <div class="legend-row"><span class="legend-sym">R-click</span><span>Hide this pair (right-click to blacklist)</span></div>
+      <div class="legend-row"><span class="legend-sym">⎘</span><span>Copy trade steps to clipboard</span></div>
+    </div>
+
+    <!-- Opportunity list -->
+    <div id="list-container">
+      <div id="opp-list" role="list"></div>
+    </div>
+
+  </div>
+
+  <!-- Undo toast -->
+  <div id="toast" role="status" aria-live="polite">
+    <span id="toast-msg"></span>
+    <button class="undo-btn" id="btn-undo" aria-label="Undo hide">Undo</button>
+  </div>
+
+  <!-- Shared hover tooltip -->
+  <div id="tooltip" class="tooltip" style="display:none" role="tooltip"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "name": "poe-arb",
+  "productName": "PoE Arb",
+  "version": "1.0.1",
+  "description": "Path of Exile 2 currency arbitrage detector overlay",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --inspect",
+    "test": "node test/rationalize.test.js && node test/threehop.test.js",
+    "dist": "electron-builder --win",
+    "dist:dir": "electron-builder --win --dir"
+  },
+  "build": {
+    "appId": "com.poearb.overlay",
+    "productName": "PoE Arb",
+    "copyright": "MIT",
+    "directories": {
+      "output": "release"
+    },
+    "asarUnpack": ["assets/**"],
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**",
+      "renderer/**",
+      "assets/**",
+      "node_modules/**",
+      "!node_modules/.cache/**"
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PoE Arb"
+    }
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}

@@ -1,0 +1,6 @@
+node_modules/
+release/
+dist/
+tmp-*.js
+*.log
+.DS_Store
